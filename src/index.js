@@ -32,7 +32,7 @@ app.get("/mcp/tools", (req, res) => {
   });
 });
 
-app.get("/tools/ping", (req, res) => {
+app.post("/tools/ping", (req, res) => {
   res.json({
     tool: "ping",
     response: "pong",
