@@ -1,12 +1,23 @@
-// MCP Server implementation placeholder
-import { ping } from "./tools/ping.js";
+import express from "express";
+import { pingTool } from "./tools/ping.js";
 
-export async function handleToolCall(toolName, args = {}) {
-  switch (toolName) {
-    case "ping":
-      return await ping();
+export function createMcpServer() {
+  const app = express();
 
-    default:
-      throw new Error(`Tool "${toolName}" not found`);
-  }
+  app.use(express.json());
+
+  // Health
+  app.get("/", (req, res) => {
+    res.json({
+      service: "MCP Server",
+      status: "ok",
+      version: "1.0.0",
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // MCP Tools
+  app.get("/tools/ping", pingTool);
+
+  return app;
 }
