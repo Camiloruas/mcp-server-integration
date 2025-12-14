@@ -1,19 +1,24 @@
-# Dockerfile placeholder
-# Etapa base
-FROM node:20-slim
+FROM node:20-alpine
 
-# Definindo o diretório de trabalho
-WORKDIR /usr/src/app
+# Criamos um usuário não-root (boa prática de segurança)
+RUN addgroup -S app && adduser -S app -G app
 
-# Instalando dependências
+WORKDIR /app
+
+# Copia apenas o necessário primeiro (cache eficiente)
 COPY package*.json ./
-RUN npm install
 
-# Copiando código-fonte
+# Instala apenas dependências de produção
+RUN npm install --omit=dev
+
+# Copia o restante do código
 COPY . .
 
-# Expondo a porta do servidor
-EXPOSE 3333
+# Ajusta permissões
+RUN chown -R app:app /app
 
-# Comando para rodar o servidor
-CMD ["node", "src/index.js"]
+USER app
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
