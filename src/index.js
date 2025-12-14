@@ -7,10 +7,11 @@ const PORT = process.env.PORT || 3333;
 app.use(cors());
 app.use(express.json());
 
-app.get("/health", (req, res) => {
+app.get("/", (req, res) => {
   res.json({
-    status: "ok",
     service: "MCP Server",
+    status: "ok",
+    version: "1.0.0",
     timestamp: new Date().toISOString(),
   });
 });
