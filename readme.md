@@ -1,6 +1,6 @@
 # MCP Server Integration
 
-Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **n8n**, **Ollama** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**, **arquitetura moderna** .
+Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **n8n**, **Ollama** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**.
 
 O projeto foi pensado para mostrar, de forma clara como criar um **servidor MCP reutilizável**, capaz de expor ferramentas (tools) que podem ser consumidas por agentes de IA e fluxos automatizados.
 
@@ -127,16 +127,10 @@ Este projeto roda em ambiente real com subdomínios:
 - `webhook.camiloruas.dev`
 - `portainer.camiloruas.dev`
 
-> O MCP Server pode futuramente ser exposto em:
-> `mcpserver.camiloruas.dev`
-
 ---
 
 ## Próximas Etapas
 
-- [ ] Expor MCP Server via Cloudflare Tunnel
-- [ ] Criar painel simples de status
-- [ ] Adicionar autenticação
 - [ ] Criar novas tools (DB, Redis, APIs)
 - [ ] Integrar memória via Redis
 
