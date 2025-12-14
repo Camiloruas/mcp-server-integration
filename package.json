@@ -10,8 +10,9 @@
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
-    "cors": "^2.8.5"
+    "node-fetch": "^3.3.2"
   },
   "repository": {
     "type": "git",

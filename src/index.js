@@ -1,14 +1,17 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch"; // Importando para fazer as requisições HTTP
+import fetch from "node-fetch";
 
 const app = express();
 const PORT = process.env.PORT || 3333;
 
+// URL de PRODUÇÃO do n8n
+const N8N_WEBHOOK_URL = "https://webhook.camiloruas.dev/webhook/mcp";
+
 app.use(cors());
 app.use(express.json());
 
-// Rota de status
+/* Health */
 app.get("/", (req, res) => {
   res.json({
     service: "MCP Server",
@@ -18,7 +21,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Rota de ferramentas
+/* Lista de tools MCP */
 app.get("/mcp/tools", (req, res) => {
   res.json({
     server: "mcp-server",
@@ -26,61 +29,60 @@ app.get("/mcp/tools", (req, res) => {
     tools: [
       {
         name: "ping",
-        description: "Health check tool",
         method: "POST",
         path: "/tools/ping",
       },
       {
-        name: "n8n-webhook",
-        description: "Send data to n8n webhook",
+        name: "n8n",
+        description: "Send actions to n8n workflows",
         method: "POST",
-        path: "/tools/n8n-webhook",
+        path: "/tools/n8n",
       },
     ],
-    timestamp: new Date().toISOString(),
   });
 });
 
-// Rota de ping
-app.get("/tools/ping", (req, res) => {
-  res.json({
-    tool: "ping",
-    response: "pong",
-    timestamp: new Date().toISOString(),
-  });
-});
+/* TOOL → n8n */
+app.post("/tools/n8n", async (req, res) => {
+  const { action, data } = req.body;
 
-// Rota para chamar o webhook do n8n
-app.post("/tools/n8n-webhook", async (req, res) => {
+  if (!action) {
+    return res.status(400).json({
+      error: "Missing 'action' field",
+    });
+  }
+
   try {
-    const response = await fetch("https://n8n.camiloruas.dev/webhook/mcp", {
+    const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(req.body), // Passa o corpo da requisição para o n8n
+      body: JSON.stringify({
+        from: "mcp-server",
+        action,
+        data: data || {},
+        timestamp: new Date().toISOString(),
+      }),
     });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    // Retorna a resposta do n8n
     res.json({
-      tool: "n8n-webhook",
-      status: "success",
-      data: data,
-      timestamp: new Date().toISOString(),
+      tool: "n8n",
+      status: "ok",
+      action,
+      n8nResponse: result,
     });
   } catch (error) {
     res.status(500).json({
-      tool: "n8n-webhook",
+      tool: "n8n",
       status: "error",
       message: error.message,
-      timestamp: new Date().toISOString(),
     });
   }
 });
 
-// Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`MCP Server running on port ${PORT}`);
 });
