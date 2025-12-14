@@ -1,12 +1,12 @@
 # MCP Server Integration
 
-Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **n8n**, **Ollama** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**, **arquitetura moderna** e **portfólio profissional**.
+Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **n8n**, **Ollama** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**, **arquitetura moderna** .
 
-O projeto foi pensado para mostrar, de forma clara para recrutadores e estudos pessoais, como criar um **servidor MCP reutilizável**, capaz de expor ferramentas (tools) que podem ser consumidas por agentes de IA e fluxos automatizados.
+O projeto foi pensado para mostrar, de forma clara como criar um **servidor MCP reutilizável**, capaz de expor ferramentas (tools) que podem ser consumidas por agentes de IA e fluxos automatizados.
 
 ---
 
-## 🎯 Objetivo do Projeto
+## Objetivo do Projeto
 
 - Implementar um **MCP Server** centralizado
 - Integrar o MCP com:
@@ -14,11 +14,10 @@ O projeto foi pensado para mostrar, de forma clara para recrutadores e estudos p
   - **Ollama** (LLMs locais, sem custo)
   - Outros serviços via HTTP
 - Demonstrar **boas práticas de arquitetura**, versionamento e documentação
-- Criar um projeto real para **portfólio profissional**
 
 ---
 
-## 🧠 O que é um MCP Server?
+## O que é um MCP Server?
 
 O **Model Context Protocol (MCP)** é um padrão que permite que agentes de IA utilizem ferramentas externas de forma organizada e reutilizável.
 
@@ -32,7 +31,7 @@ Com um MCP Server você pode:
 
 ---
 
-## 🏗️ Arquitetura Geral
+## Arquitetura Geral
 
 ```text
 [ IA / LLM (Ollama) ]
@@ -46,12 +45,13 @@ Com um MCP Server você pode:
 ```
 
 Documentação detalhada:
+
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/mcp-overview.md`](docs/mcp-overview.md)
 
 ---
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```bash
 mcp-server-integration/
@@ -72,7 +72,7 @@ mcp-server-integration/
 
 ---
 
-## 🐳 Executando com Docker
+## Executando com Docker
 
 ### Pré-requisitos
 
@@ -93,7 +93,7 @@ docker compose logs -f mcp-server
 
 ---
 
-## 🔧 Ferramentas (Tools) Disponíveis
+## Ferramentas (Tools) Disponíveis
 
 Exemplos de tools já implementadas:
 
@@ -104,7 +104,7 @@ Essas tools podem ser chamadas por agentes MCP ou fluxos automatizados.
 
 ---
 
-## 🔗 Integração com n8n
+## Integração com n8n
 
 - O MCP Server pode chamar webhooks do n8n
 - O n8n pode chamar endpoints do MCP
@@ -119,13 +119,12 @@ Exemplo de uso:
 
 ---
 
-## 🌐 Domínios Utilizados (Ambiente Real)
+## Domínios Utilizados (Ambiente Real)
 
 Este projeto roda em ambiente real com subdomínios:
 
 - `n8n.camiloruas.dev`
 - `webhook.camiloruas.dev`
-- `evolution.camiloruas.dev`
 - `portainer.camiloruas.dev`
 
 > O MCP Server pode futuramente ser exposto em:
@@ -133,7 +132,7 @@ Este projeto roda em ambiente real com subdomínios:
 
 ---
 
-## 📈 Próximas Etapas
+## Próximas Etapas
 
 - [ ] Expor MCP Server via Cloudflare Tunnel
 - [ ] Criar painel simples de status
@@ -143,7 +142,7 @@ Este projeto roda em ambiente real com subdomínios:
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 **Camilo Ruas**  
 Desenvolvedor Web | Automação | IA | n8n | MCP
@@ -153,15 +152,12 @@ Desenvolvedor Web | Automação | IA | n8n | MCP
 
 ---
 
-## 📌 Observação Importante
+## Observação Importante
 
 Este projeto é **100% educacional e prático**, utilizando apenas ferramentas locais ou gratuitas, sem custos com APIs pagas.
 
 Ele reflete um ambiente real de estudos e experimentação, exatamente como usado no dia a dia.
 
-> Não são utilizados ícones de figurinhas geradas por IA neste projeto.
-
 ---
 
-🚀 *Projeto em constante evolução.*
-
+_Projeto em constante evolução._
