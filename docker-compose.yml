@@ -1,1 +1,13 @@
 # docker-compose.yml placeholder
+services:
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-server
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    environment:
+      - NODE_ENV=production
+      - MCP_SERVER_URL=http://localhost:3333

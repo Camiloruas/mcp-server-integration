@@ -1,7 +1,7 @@
 # Ignore files for Gemini CLI
 # Add any files or directories here that you want the Gemini CLI to ignore.
 # These patterns are similar to .gitignore.
-
+node_modules
 # Example: ignore all .log files
 *.log
 
