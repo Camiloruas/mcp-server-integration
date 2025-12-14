@@ -1,0 +1,1 @@
+// Ping tool implementation placeholder
