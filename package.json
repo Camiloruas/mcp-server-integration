@@ -1,28 +1,25 @@
 {
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.2.1"
-  },
   "name": "mcp-server-integration",
   "version": "1.0.0",
-  "description": "Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **n8n**, **Ollama** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**.",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "description": "Integração de um MCP Server (Model Context Protocol) com n8n, Ollama e outros serviços, rodando em Docker.",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Camiloruas/mcp-server-integration.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Camiloruas/mcp-server-integration/issues"
   },
-  "homepage": "https://github.com/Camiloruas/mcp-server-integration#readme"
+  "homepage": "https://github.com/Camiloruas/mcp-server-integration#readme",
+  "license": "ISC"
 }
