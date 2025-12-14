@@ -159,6 +159,8 @@ Este projeto é **100% educacional e prático**, utilizando apenas ferramentas l
 
 Ele reflete um ambiente real de estudos e experimentação, exatamente como usado no dia a dia.
 
+> Não são utilizados ícones de figurinhas geradas por IA neste projeto.
+
 ---
 
 🚀 *Projeto em constante evolução.*

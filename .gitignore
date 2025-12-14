@@ -1,0 +1,21 @@
+# Ignore files for Gemini CLI
+# Add any files or directories here that you want the Gemini CLI to ignore.
+# These patterns are similar to .gitignore.
+
+# Example: ignore all .log files
+*.log
+
+# Example: ignore a specific directory
+/dist/
+/build/
+/tmp/
+
+# Ignore .env files, but keep .env.example
+.env
+!.env.example
+
+# Ignore AI-generated sticker icons (as requested)
+*.ai_sticker.png
+*.ai_sticker.jpg
+*.ai_sticker.jpeg
+*.ai_sticker.gif
