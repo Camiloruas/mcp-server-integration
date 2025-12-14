@@ -1,13 +1,11 @@
-version: "3.9"
-
 services:
   mcp-server:
-    container_name: mcp-server
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
+    container_name: mcp-server
+    restart: unless-stopped
     env_file:
       - .env
     ports:
-      - "3000:3000"
-    restart: unless-stopped
+      - "3333:3333"
