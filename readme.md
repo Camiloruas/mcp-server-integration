@@ -27,7 +27,7 @@ Com um MCP Server você pode:
 - Expor ferramentas reutilizáveis (ex: webhooks, APIs, bancos de dados)
 - Usar o mesmo servidor para múltiplos agentes e automações
 
-👉 Em vez de cada fluxo falar direto com cada serviço, **tudo passa pelo MCP**.
+Em vez de cada fluxo falar direto com cada serviço, **tudo passa pelo MCP**.
 
 ---
 
