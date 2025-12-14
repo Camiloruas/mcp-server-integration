@@ -16,6 +16,22 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/mcp/tools", (req, res) => {
+  res.json({
+    server: "mcp-server",
+    version: "1.0.0",
+    tools: [
+      {
+        name: "ping",
+        description: "Health check tool",
+        method: "POST",
+        path: "/tools/ping",
+      },
+    ],
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/tools/ping", (req, res) => {
   res.json({
     tool: "ping",
