@@ -1,15 +1,18 @@
 services:
   mcp-server:
-    image: mcp-server-final  # <-- USE A IMAGEM CONSTRUÍDA
-    # build:
-    #   context: .
-    #   dockerfile: docker/Dockerfile
+    image: mcp-server-final
     container_name: mcp-server
     restart: unless-stopped
+
     env_file:
       - .env
+
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
     ports:
       - "3333:3333"
+
     dns:
       - 8.8.8.8
       - 1.1.1.1
