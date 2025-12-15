@@ -1,6 +1,9 @@
 services:
   mcp-server:
-    image: mcp-server-final
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+
     container_name: mcp-server
     restart: unless-stopped
 
