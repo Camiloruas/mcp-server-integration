@@ -66,15 +66,38 @@ app.post("/tools/n8n", async (req, res) => {
       }),
     });
 
-    const result = await response.json();
+    // --- INÍCIO DA ALTERAÇÃO (CÓDIGO RESILIENTE ANTI-502) ---
 
+    // 1. Lê a resposta do n8n como texto (mais seguro contra timeouts e JSON inválido)
+    const responseText = await response.text();
+    let result;
+
+    try {
+      // 2. Tenta parsear o texto em JSON
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      // 3. Se falhar, encapsula o erro e a resposta bruta para debug
+      console.error("JSON Parsing Error from n8n:", parseError.message);
+      result = {
+        error: "Failed to parse n8n response as JSON",
+        rawResponse: responseText,
+        status: response.status,
+        statusText: response.statusText,
+      };
+    }
+
+    // 4. Devolve o resultado encapsulado (JSON parseado OU o objeto de erro)
     res.json({
       tool: "n8n",
       status: "ok",
       action,
       n8nResponse: result,
     });
+    
+    // --- FIM DA ALTERAÇÃO ---
+
   } catch (error) {
+    // Este catch lida com falhas de rede (ex: n8n completamente offline)
     res.status(500).json({
       tool: "n8n",
       status: "error",
