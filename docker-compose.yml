@@ -1,9 +1,9 @@
 services:
   mcp-server:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    # image: mcp-server-final  # <-- REMOVA OU COMENTE ESTA LINHA TEMPORÁRIA
+    image: mcp-server-final  # <-- USE A IMAGEM CONSTRUÍDA
+    # build:
+    #   context: .
+    #   dockerfile: docker/Dockerfile
     container_name: mcp-server
     restart: unless-stopped
     env_file:
@@ -11,5 +11,5 @@ services:
     ports:
       - "3333:3333"
     dns:
-      - 8.8.8.8 # DNS primário (Google)
-      - 1.1.1.1 # DNS secundário (Cloudflare)
+      - 8.8.8.8
+      - 1.1.1.1
