@@ -5,33 +5,33 @@ const openai = new OpenAI({
 });
 
 export async function aiTool(req, res) {
-  const { prompt } = req.body;
-
-  if (!prompt) {
-    return res.status(400).json({
-      error: "Missing 'prompt' field",
-    });
-  }
-
   try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({
+        error: "Missing 'prompt' field",
+      });
+    }
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt },
       ],
-      temperature: 0.7,
     });
 
-    res.json({
+    return res.json({
       tool: "ai",
+      status: "ok",
       prompt,
       response: response.choices[0].message.content,
     });
   } catch (error) {
-    console.error("OpenAI error:", error.message);
+    console.error("AI TOOL ERROR:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       tool: "ai",
       status: "error",
       message: error.message,
