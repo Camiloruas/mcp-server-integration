@@ -9,3 +9,8 @@ services:
       - .env
     ports:
       - "3333:3333"
+    # --- NOVO BLOCO DNS ADICIONADO AQUI ---
+    dns:
+      - 8.8.8.8 # DNS primário (Google)
+      - 1.1.1.1 # DNS secundário (Cloudflare)
+    # --- FIM DO BLOCO DNS ---
