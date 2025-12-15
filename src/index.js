@@ -38,6 +38,12 @@ app.get("/mcp/tools", (req, res) => {
         method: "POST",
         path: "/tools/n8n",
       },
+      {
+        name: "ai",
+        description: "OpenAI text generation",
+        method: "POST",
+        path: "/tools/ai",
+      },
     ],
   });
 });
@@ -93,9 +99,8 @@ app.post("/tools/n8n", async (req, res) => {
       action,
       n8nResponse: result,
     });
-    
-    // --- FIM DA ALTERAÇÃO ---
 
+    // --- FIM DA ALTERAÇÃO ---
   } catch (error) {
     // Este catch lida com falhas de rede (ex: n8n completamente offline)
     res.status(500).json({
