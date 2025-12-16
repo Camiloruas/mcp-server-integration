@@ -1,78 +1,84 @@
 # MCP Server Integration
 
-Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **n8n**, **Ollama** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**.
+Este repositório demonstra a **integração de um MCP Server (Model Context Protocol)** com **OpenAI**, **n8n** e outros serviços, rodando em ambiente **Docker**, com foco em **aprendizado prático**, **arquitetura real** e **boas práticas de backend**.
 
-O projeto foi pensado para mostrar, de forma clara como criar um **servidor MCP reutilizável**, capaz de expor ferramentas (tools) que podem ser consumidas por agentes de IA e fluxos automatizados.
+O projeto foi desenvolvido como um **ambiente real de estudos**, simulando cenários de produção: uso de containers, variáveis de ambiente, fallback de IA, timeout, retry e observabilidade básica.
 
 ---
 
 ## Objetivo do Projeto
 
-- Implementar um **MCP Server** centralizado
+- Implementar um **MCP Server** centralizado em Node.js
+- Expor ferramentas MCP via REST
 - Integrar o MCP com:
+  - **OpenAI** (IA externa, com fallback automático)
   - **n8n** (orquestração de workflows)
-  - **Ollama** (LLMs locais, sem custo)
-  - Outros serviços via HTTP
-- Demonstrar **boas práticas de arquitetura**, versionamento e documentação
+- Demonstrar:
+  - uso correto de Docker e Docker Compose
+  - controle de variáveis de ambiente
+  - resiliência (fallback, timeout, retry)
+  - documentação clara e profissional
 
 ---
 
 ## O que é um MCP Server?
 
-O **Model Context Protocol (MCP)** é um padrão que permite que agentes de IA utilizem ferramentas externas de forma organizada e reutilizável.
+O **Model Context Protocol (MCP)** é um padrão que permite que agentes de IA utilizem **ferramentas externas** de forma organizada, reutilizável e desacoplada.
 
-Com um MCP Server você pode:
+Com um MCP Server, você consegue:
 
 - Centralizar integrações
-- Expor ferramentas reutilizáveis (ex: webhooks, APIs, bancos de dados)
-- Usar o mesmo servidor para múltiplos agentes e automações
+- Expor ferramentas reutilizáveis (APIs, webhooks, serviços)
+- Usar o mesmo servidor para múltiplos agentes ou automações
 
-Em vez de cada fluxo falar direto com cada serviço, **tudo passa pelo MCP**.
+Em vez de cada agente ou fluxo falar diretamente com cada serviço, **tudo passa pelo MCP Server**.
 
 ---
 
 ## Arquitetura Geral
 
 ```text
-[ IA / LLM (Ollama) ]
-        |
-        v
-[ MCP Server ]
-        |
-        +--> n8n Webhooks
-        +--> APIs externas
-        +--> Ferramentas locais
+[ Cliente / IA / Automação ]
+            |
+            v
+     [ MCP Server ]
+            |
+            +--> OpenAI (IA externa)
+            +--> n8n (Workflows)
+            +--> APIs / Serviços
 ```
 
-Documentação detalhada:
-
-- [`docs/architecture.md`](docs/architecture.md)
-- [`docs/mcp-overview.md`](docs/mcp-overview.md)
+O MCP atua como **camada intermediária**, responsável por:
+- decidir qual tool usar
+- tratar falhas externas
+- padronizar respostas
 
 ---
 
 ## Estrutura do Projeto
 
 ```bash
-mcp-server-integration/
+mcp-server/
 ├── docker/
 │   └── Dockerfile
 ├── docker-compose.yml
 ├── docs/
-│   ├── architecture.md
-│   └── mcp-overview.md
 ├── src/
 │   ├── index.js
 │   ├── mcpServer.js
 │   └── tools/
+│       ├── ai.js
+│       ├── aiInfo.js
+│       ├── ping.js
 │       ├── callN8nWebhook.js
-│       └── ping.js
-└── README.md
+│       └── n8n.js
+├── .env.example
+├── README.md
 ```
 
 ---
 
-## Executando com Docker
+## Execução com Docker
 
 ### Pré-requisitos
 
@@ -95,44 +101,111 @@ docker compose logs -f mcp-server
 
 ## Ferramentas (Tools) Disponíveis
 
-Exemplos de tools já implementadas:
+### Health Check
 
-- **ping** → Teste simples de conectividade
-- **callN8nWebhook** → Dispara webhooks no n8n
-
-Essas tools podem ser chamadas por agentes MCP ou fluxos automatizados.
-
----
-
-## Integração com n8n
-
-- O MCP Server pode chamar webhooks do n8n
-- O n8n pode chamar endpoints do MCP
-- Permite criar **agentes inteligentes orquestrados**
-
-Exemplo de uso:
-
-- IA recebe mensagem
-- MCP decide qual tool usar
-- n8n executa lógica complexa
-- Resultado retorna para o agente
+```http
+GET /
+```
+Retorna o status do MCP Server.
 
 ---
 
-## Domínios Utilizados (Ambiente Real)
+### Ping
 
-Este projeto roda em ambiente real com subdomínios:
+```http
+GET /tools/ping
+```
+Teste simples de conectividade.
 
+---
+
+### Integração com n8n
+
+```http
+POST /tools/n8n
+```
+
+Permite disparar webhooks do n8n a partir do MCP Server.
+
+---
+
+### Tool de IA (OpenAI + Mock)
+
+```http
+POST /tools/ai
+```
+
+Características:
+- Suporte a OpenAI real
+- Fallback automático para **mock** em caso de erro
+- Timeout generoso
+- Retry controlado
+
+---
+
+### Diagnóstico da IA
+
+```http
+GET /tools/ai/info
+```
+
+Exemplo de resposta:
+
+```json
+{
+  "tool": "ai",
+  "mode": "openai",
+  "model": "gpt-4.1-nano",
+  "openaiEnabled": true,
+  "timestamp": "2025-12-16T13:16:21.099Z"
+}
+```
+
+Esse endpoint **não consome tokens** e é usado para diagnóstico e monitoramento.
+
+---
+
+## Containers em Execução (Ambiente Real)
+
+O projeto roda em um servidor self-hosted, com múltiplos containers gerenciados via **Portainer**.
+
+### Visão Geral dos Containers
+
+> A imagem abaixo mostra os containers ativos no ambiente real, incluindo MCP Server, n8n, Redis, Postgres e Portainer.
+
+<!-- IMAGEM: Containers rodando no Portainer -->
+
+*(Inserir aqui a imagem do Portainer mostrando os containers em execução)*
+
+---
+
+## Domínios Utilizados
+
+- `mcp.camiloruas.dev`
 - `n8n.camiloruas.dev`
-- `webhook.camiloruas.dev`
 - `portainer.camiloruas.dev`
+
+A exposição externa é feita via **Cloudflare Tunnel**.
+
+---
+
+## Boas Práticas Aplicadas
+
+- `.env` não versionado
+- `.env.example` para referência
+- Containers isolados
+- Fallback automático de IA
+- Timeout e retry controlados
+- Código organizado por responsabilidade
 
 ---
 
 ## Próximas Etapas
 
-- [ ] Criar novas tools (DB, Redis, APIs)
-- [ ] Integrar memória via Redis
+- [ ] Novas tools (Redis, Postgres)
+- [ ] Autenticação de endpoints
+- [ ] Observabilidade (logs estruturados)
+- [ ] Testes automatizados
 
 ---
 
@@ -146,12 +219,9 @@ Desenvolvedor Web | Automação | IA | n8n | MCP
 
 ---
 
-## Observação Importante
+## Observação Final
 
-Este projeto é **100% educacional e prático**, utilizando apenas ferramentas locais ou gratuitas, sem custos com APIs pagas.
-
-Ele reflete um ambiente real de estudos e experimentação, exatamente como usado no dia a dia.
-
----
+Este projeto reflete um **ambiente real de estudos e experimentação**, com decisões técnicas baseadas em problemas reais enfrentados no dia a dia.
 
 _Projeto em constante evolução._
+

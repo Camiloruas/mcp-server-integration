@@ -9,7 +9,7 @@ function getOpenAIClient() {
 
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-    timeout: 30000, // ⏱️ 30 segundos
+    timeout: 30000, //  30 segundos
   });
 }
 
