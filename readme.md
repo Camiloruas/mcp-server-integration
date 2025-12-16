@@ -175,7 +175,8 @@ O projeto roda em um servidor self-hosted, com múltiplos containers gerenciados
 
 <!-- IMAGEM: Containers rodando no Portainer -->
 
-*(Inserir aqui a imagem do Portainer mostrando os containers em execução)*
+![Containers rodando no Portainer](docs/images/portainer.png)
+
 
 ---
 
