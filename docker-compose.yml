@@ -12,6 +12,7 @@ services:
 
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AI_MODE: ${AI_MODE}
 
     ports:
       - "3333:3333"
