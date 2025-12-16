@@ -9,6 +9,7 @@ function getOpenAIClient() {
 
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
+    timeout: 30000, // ⏱️ 30 segundos
   });
 }
 
@@ -22,6 +23,18 @@ function mockResponse(prompt, reason = "mock") {
     prompt,
     response: "IA mock funcionando",
   };
+}
+
+async function callOpenAIWithRetry(client, payload, retries = 1) {
+  try {
+    return await client.chat.completions.create(payload);
+  } catch (error) {
+    if (retries > 0) {
+      console.warn("OpenAI timeout/error, retrying once...");
+      return callOpenAIWithRetry(client, payload, retries - 1);
+    }
+    throw error;
+  }
 }
 
 export async function aiTool(req, res) {
@@ -45,18 +58,20 @@ export async function aiTool(req, res) {
     });
   }
 
-  /* OPENAI COM FALLBACK */
+  /* OPENAI COM TIMEOUT + RETRY + FALLBACK */
   try {
     const client = getOpenAIClient();
 
-    const completion = await client.chat.completions.create({
-      model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+    const payload = {
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [
         { role: "system", content: "Você é um assistente técnico e objetivo." },
         { role: "user", content: prompt },
       ],
       temperature: 0.4,
-    });
+    };
+
+    const completion = await callOpenAIWithRetry(client, payload, 1);
 
     return res.json({
       tool: "ai",
