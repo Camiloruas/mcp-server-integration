@@ -2,6 +2,7 @@ import express from "express";
 import { pingTool } from "./tools/ping.js";
 import { callN8nWebhook } from "./tools/callN8nWebhook.js";
 import { aiTool } from "./tools/ai.js";
+import { aiInfoTool } from "./tools/aiInfo.js";
 
 export function createMcpServer() {
   const app = express();
@@ -20,6 +21,7 @@ export function createMcpServer() {
   app.get("/tools/ping", pingTool);
   app.post("/tools/n8n", callN8nWebhook);
   app.post("/tools/ai", aiTool);
+  app.get("/tools/ai/info", aiInfoTool);
 
   return app;
 }
