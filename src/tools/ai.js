@@ -1,56 +1,74 @@
 import OpenAI from "openai";
 
-const client = process.env.AI_MODE === "openai"
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+function getOpenAIClient() {
+  if (process.env.AI_MODE !== "openai") return null;
+
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY not configured");
+  }
+
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
+
+function mockResponse(prompt, reason = "mock") {
+  return {
+    tool: "ai",
+    status: "ok",
+    mode: "mock",
+    fallback: true,
+    reason,
+    prompt,
+    response: "IA mock funcionando",
+  };
+}
 
 export async function aiTool(req, res) {
   const { prompt } = req.body;
 
   if (!prompt) {
     return res.status(400).json({
-      error: "Missing 'prompt'"
+      error: "Missing 'prompt'",
     });
   }
 
-  /* MODO MOCK */
+  /* MOCK FORÇADO */
   if (process.env.AI_MODE !== "openai") {
     return res.json({
       tool: "ai",
       status: "ok",
       mode: "mock",
+      fallback: false,
       prompt,
-      response: "IA mock funcionando"
+      response: "IA mock funcionando",
     });
   }
 
-  /* MODO OPENAI REAL */
+  /* OPENAI COM FALLBACK */
   try {
+    const client = getOpenAIClient();
+
     const completion = await client.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
       messages: [
         { role: "system", content: "Você é um assistente técnico e objetivo." },
-        { role: "user", content: prompt }
+        { role: "user", content: prompt },
       ],
-      temperature: 0.4
+      temperature: 0.4,
     });
 
     return res.json({
       tool: "ai",
       status: "ok",
       mode: "openai",
+      fallback: false,
       prompt,
-      response: completion.choices[0].message.content
+      response: completion.choices[0].message.content,
     });
-
   } catch (error) {
-    console.error("OPENAI ERROR:", error.message);
+    console.error("OPENAI ERROR — fallback to mock:", error.message);
 
-    return res.status(502).json({
-      tool: "ai",
-      status: "error",
-      message: "OpenAI request failed",
-      details: error.message
-    });
+    return res.json(mockResponse(prompt, error.message));
   }
 }
