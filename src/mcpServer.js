@@ -4,6 +4,8 @@ import { callN8nWebhook } from "./tools/callN8nWebhook.js";
 import { aiTool } from "./tools/ai.js";
 import { aiInfoTool } from "./tools/aiInfo.js";
 import { evolutionWebhookTool } from "./tools/evolutionWebhook.js";
+import { workflowRunTool } from "./tools/workflowRun.js";
+
 
 
 export function createMcpServer() {
@@ -25,6 +27,8 @@ export function createMcpServer() {
   app.post("/tools/ai", aiTool);
   app.get("/tools/ai/info", aiInfoTool);
   app.post("/webhook/evolution", evolutionWebhookTool);
+  app.post("/tools/workflow/run", workflowRunTool);
+
 
 
   return app;
