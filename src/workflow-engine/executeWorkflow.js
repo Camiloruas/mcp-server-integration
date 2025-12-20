@@ -3,7 +3,11 @@ export async function executeWorkflow(workflow, context = {}) {
   let currentStepId = workflow.steps[0].id;
   let lastOutput = null;
 
-  // Indexa os steps por ID
+  // garante estrutura mínima do contexto
+  context.input = context.input || {};
+  context.state = context.state || {};
+
+  // indexa os steps
   for (const step of workflow.steps) {
     stepsMap.set(step.id, step);
   }
@@ -16,14 +20,19 @@ export async function executeWorkflow(workflow, context = {}) {
 
     switch (step.type) {
       case "condition": {
-        const conditionResult = evaluateCondition(step.expression, context);
+        const result = evaluateCondition(step.expression, context);
+        currentStepId = result ? step.onTrue : step.onFalse;
+        break;
+      }
 
-        currentStepId = conditionResult ? step.onTrue : step.onFalse;
+      case "transform": {
+        applyTransform(step.action, context);
+        currentStepId = step.next;
         break;
       }
 
       case "respond": {
-        lastOutput = step.payload;
+        lastOutput = resolvePayload(step.payload, context);
         return lastOutput;
       }
 
@@ -35,16 +44,48 @@ export async function executeWorkflow(workflow, context = {}) {
   return lastOutput;
 }
 
-/**
- * Avalia condições conhecidas
- * (simples e seguro)
- */
+/* =========================
+   CONDITIONS
+========================= */
 function evaluateCondition(expression, context) {
   switch (expression) {
     case "hasMessage":
       return Boolean(context.input?.message);
-
     default:
       throw new Error(`Unknown condition: ${expression}`);
   }
+}
+
+/* =========================
+   TRANSFORMS
+========================= */
+function applyTransform(action, context) {
+  switch (action) {
+    case "uppercaseMessage":
+      context.state.message = String(context.input.message).toUpperCase();
+      break;
+
+    default:
+      throw new Error(`Unknown transform: ${action}`);
+  }
+}
+
+/* =========================
+   PAYLOAD RESOLUTION
+========================= */
+function resolvePayload(payload, context) {
+  const resolved = {};
+
+  for (const key in payload) {
+    const value = payload[key];
+
+    if (typeof value === "string" && value.startsWith("{{")) {
+      const field = value.replace(/[{}]/g, "");
+      resolved[key] = context.state[field] ?? context.input[field];
+    } else {
+      resolved[key] = value;
+    }
+  }
+
+  return resolved;
 }

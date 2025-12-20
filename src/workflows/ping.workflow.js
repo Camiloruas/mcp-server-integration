@@ -2,8 +2,8 @@ export const pingWorkflow = {
   metadata: {
     id: "ping-workflow",
     name: "Ping Workflow",
-    description: "Workflow com condition",
-    version: "1.1.0",
+    description: "Workflow com condition + transform",
+    version: "1.2.0",
     status: "draft",
   },
 
@@ -23,14 +23,20 @@ export const pingWorkflow = {
       id: "check-message",
       type: "condition",
       expression: "hasMessage",
-      onTrue: "respond-with-message",
+      onTrue: "transform-message",
       onFalse: "respond-pong",
+    },
+    {
+      id: "transform-message",
+      type: "transform",
+      action: "uppercaseMessage",
+      next: "respond-with-message",
     },
     {
       id: "respond-with-message",
       type: "respond",
       payload: {
-        message: "mensagem recebida",
+        message: "{{message}}",
       },
     },
     {
