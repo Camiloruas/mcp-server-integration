@@ -2,8 +2,8 @@ export const pingWorkflow = {
   metadata: {
     id: "ping-workflow",
     name: "Ping Workflow",
-    description: "Workflow de teste para validar o motor",
-    version: "1.0.0",
+    description: "Workflow com condition",
+    version: "1.1.0",
     status: "draft",
   },
 
@@ -11,9 +11,28 @@ export const pingWorkflow = {
     type: "manual",
   },
 
-  inputs: {},
+  inputs: {
+    message: {
+      type: "string",
+      required: false,
+    },
+  },
 
   steps: [
+    {
+      id: "check-message",
+      type: "condition",
+      expression: "hasMessage",
+      onTrue: "respond-with-message",
+      onFalse: "respond-pong",
+    },
+    {
+      id: "respond-with-message",
+      type: "respond",
+      payload: {
+        message: "mensagem recebida",
+      },
+    },
     {
       id: "respond-pong",
       type: "respond",
