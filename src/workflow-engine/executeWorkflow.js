@@ -1,13 +1,13 @@
+import fetch from "node-fetch";
+
 export async function executeWorkflow(workflow, context = {}) {
   const stepsMap = new Map();
   let currentStepId = workflow.steps[0].id;
   let lastOutput = null;
 
-  // garante estrutura mínima do contexto
   context.input = context.input || {};
   context.state = context.state || {};
 
-  // indexa os steps
   for (const step of workflow.steps) {
     stepsMap.set(step.id, step);
   }
@@ -27,6 +27,13 @@ export async function executeWorkflow(workflow, context = {}) {
 
       case "transform": {
         applyTransform(step.action, context);
+        currentStepId = step.next;
+        break;
+      }
+
+      case "request": {
+        const response = await executeRequest(step, context);
+        context.state[step.saveAs] = response;
         currentStepId = step.next;
         break;
       }
@@ -64,14 +71,28 @@ function applyTransform(action, context) {
     case "uppercaseMessage":
       context.state.message = String(context.input.message).toUpperCase();
       break;
-
     default:
       throw new Error(`Unknown transform: ${action}`);
   }
 }
 
 /* =========================
-   PAYLOAD RESOLUTION
+   REQUEST
+========================= */
+async function executeRequest(step) {
+  const response = await fetch(step.url, {
+    method: step.method || "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/* =========================
+   PAYLOAD
 ========================= */
 function resolvePayload(payload, context) {
   const resolved = {};

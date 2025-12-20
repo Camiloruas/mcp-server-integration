@@ -2,8 +2,8 @@ export const pingWorkflow = {
   metadata: {
     id: "ping-workflow",
     name: "Ping Workflow",
-    description: "Workflow com condition + transform",
-    version: "1.2.0",
+    description: "Workflow com condition + transform + request",
+    version: "1.3.0",
     status: "draft",
   },
 
@@ -24,7 +24,7 @@ export const pingWorkflow = {
       type: "condition",
       expression: "hasMessage",
       onTrue: "transform-message",
-      onFalse: "respond-pong",
+      onFalse: "call-ping-api",
     },
     {
       id: "transform-message",
@@ -33,17 +33,25 @@ export const pingWorkflow = {
       next: "respond-with-message",
     },
     {
+      id: "call-ping-api",
+      type: "request",
+      method: "GET",
+      url: "https://mcp.camiloruas.dev/tools/ping",
+      saveAs: "pingResult",
+      next: "respond-from-api",
+    },
+    {
+      id: "respond-from-api",
+      type: "respond",
+      payload: {
+        message: "{{pingResult.result}}",
+      },
+    },
+    {
       id: "respond-with-message",
       type: "respond",
       payload: {
         message: "{{message}}",
-      },
-    },
-    {
-      id: "respond-pong",
-      type: "respond",
-      payload: {
-        message: "pong",
       },
     },
   ],
