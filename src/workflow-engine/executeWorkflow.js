@@ -51,6 +51,14 @@ export async function executeWorkflow(workflow, context = {}) {
   return lastOutput;
 }
 
+function getByPath(obj, path) {
+  return path.split(".").reduce((acc, key) => {
+    if (acc && acc[key] !== undefined) {
+      return acc[key];
+    }
+    return undefined;
+  }, obj);
+}
 /* =========================
    CONDITIONS
 ========================= */
@@ -101,8 +109,13 @@ function resolvePayload(payload, context) {
     const value = payload[key];
 
     if (typeof value === "string" && value.startsWith("{{")) {
-      const field = value.replace(/[{}]/g, "");
-      resolved[key] = context.state[field] ?? context.input[field];
+      const expression = value.replace(/[{}]/g, "").trim();
+
+      // tenta resolver primeiro no state, depois no input
+      const fromState = getByPath(context.state, expression);
+      const fromInput = getByPath(context.input, expression);
+
+      resolved[key] = fromState !== undefined ? fromState : fromInput;
     } else {
       resolved[key] = value;
     }
