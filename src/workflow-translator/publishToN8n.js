@@ -12,15 +12,15 @@ export async function publishToN8n(workflowJson) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-N8N-API-KEY": apiKey
+      "X-N8N-API-KEY": apiKey,
     },
     body: JSON.stringify({
       name: workflowJson.name,
       nodes: workflowJson.nodes,
       connections: workflowJson.connections,
       active: false,
-      settings: workflowJson.settings || {}
-    })
+      settings: workflowJson.settings || {},
+    }),
   });
 
   if (!response.ok) {
