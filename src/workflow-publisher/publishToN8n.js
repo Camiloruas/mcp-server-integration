@@ -8,19 +8,19 @@ export async function publishToN8n(workflowJson) {
     throw new Error("N8N_BASE_URL or N8N_API_KEY not configured");
   }
 
-  const response = await fetch(`${baseUrl}/rest/workflows`, {
+  const response = await fetch(`${baseUrl}/api/v1/workflows`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-N8N-API-KEY": apiKey
+      "X-N8N-API-KEY": apiKey,
     },
     body: JSON.stringify({
       name: workflowJson.name,
       nodes: workflowJson.nodes,
       connections: workflowJson.connections,
+      settings: workflowJson.settings || {},
       active: false,
-      settings: workflowJson.settings || {}
-    })
+    }),
   });
 
   if (!response.ok) {
