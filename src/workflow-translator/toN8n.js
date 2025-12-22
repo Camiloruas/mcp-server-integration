@@ -87,4 +87,3 @@ export function translateWorkflowToN8n(workflow) {
     settings: {}
   };
 }
-s
