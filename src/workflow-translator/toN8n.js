@@ -3,7 +3,15 @@ export function translateWorkflowToN8n(workflow) {
   const connections = {};
 
   /* =========================
-     1️⃣ Manual Trigger
+     INDEXAR STEPS
+  ========================= */
+  const stepsMap = new Map();
+  for (const step of workflow.steps) {
+    stepsMap.set(step.id, step);
+  }
+
+  /* =========================
+     MANUAL TRIGGER
   ========================= */
   const triggerNode = {
     id: "manual-trigger",
@@ -11,15 +19,16 @@ export function translateWorkflowToN8n(workflow) {
     type: "n8n-nodes-base.manualTrigger",
     typeVersion: 1,
     position: [200, 300],
-    parameters: {}
+    parameters: {},
   };
 
   nodes.push(triggerNode);
 
   /* =========================
-     2️⃣ Traduzir steps
+     CRIAR NODES
   ========================= */
-  let previousNodeName = triggerNode.name;
+  const nodeByStepId = {};
+  let x = 400;
 
   for (const step of workflow.steps) {
     let node;
@@ -30,18 +39,17 @@ export function translateWorkflowToN8n(workflow) {
         name: step.id,
         type: "n8n-nodes-base.if",
         typeVersion: 1,
-        position: [400, 300],
+        position: [x, 300],
         parameters: {
           conditions: {
-            boolean: [
+            string: [
               {
-                value1: true,
-                operation: "equal",
-                value2: true
-              }
-            ]
-          }
-        }
+                value1: "={{$json.message}}",
+                operation: "notEmpty",
+              },
+            ],
+          },
+        },
       };
     }
 
@@ -51,39 +59,54 @@ export function translateWorkflowToN8n(workflow) {
         name: step.id,
         type: "n8n-nodes-base.set",
         typeVersion: 1,
-        position: [600, 300],
+        position: [x, 150],
         parameters: {
           values: {
             string: [
               {
                 name: "message",
-                value: step.payload.message || ""
-              }
-            ]
-          }
-        }
+                value: step.payload.message,
+              },
+            ],
+          },
+        },
       };
     }
 
     if (!node) continue;
 
     nodes.push(node);
-
-    connections[previousNodeName] = {
-      main: [[{ node: node.name, type: "main", index: 0 }]]
-    };
-
-    previousNodeName = node.name;
+    nodeByStepId[step.id] = node;
+    x += 200;
   }
 
   /* =========================
-     3️⃣ Workflow final
+     CONEXÕES
   ========================= */
+
+  // Trigger → primeiro step
+  connections["Manual Trigger"] = {
+    main: [[{ node: workflow.steps[0].id, type: "main", index: 0 }]],
+  };
+
+  for (const step of workflow.steps) {
+    if (step.type === "condition") {
+      connections[step.id] = {
+        main: [
+          // TRUE
+          [{ node: step.onTrue, type: "main", index: 0 }],
+          // FALSE
+          [{ node: step.onFalse, type: "main", index: 0 }],
+        ],
+      };
+    }
+  }
+
   return {
     name: workflow.metadata.name,
     nodes,
     connections,
     active: false,
-    settings: {}
+    settings: {},
   };
 }
