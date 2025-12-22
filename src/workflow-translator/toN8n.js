@@ -33,6 +33,7 @@ export function translateWorkflowToN8n(workflow) {
   for (const step of workflow.steps) {
     let node;
 
+    /* -------- IF -------- */
     if (step.type === "condition") {
       node = {
         id: step.id,
@@ -53,6 +54,23 @@ export function translateWorkflowToN8n(workflow) {
       };
     }
 
+    /* -------- REQUEST -------- */
+    if (step.type === "request") {
+      node = {
+        id: step.id,
+        name: step.id,
+        type: "n8n-nodes-base.httpRequest",
+        typeVersion: 4,
+        position: [x, 300],
+        parameters: {
+          url: step.url,
+          requestMethod: step.method || "GET",
+          responseFormat: "json",
+        },
+      };
+    }
+
+    /* -------- RESPOND -------- */
     if (step.type === "respond") {
       node = {
         id: step.id,
@@ -92,12 +110,13 @@ export function translateWorkflowToN8n(workflow) {
   for (const step of workflow.steps) {
     if (step.type === "condition") {
       connections[step.id] = {
-        main: [
-          // TRUE
-          [{ node: step.onTrue, type: "main", index: 0 }],
-          // FALSE
-          [{ node: step.onFalse, type: "main", index: 0 }],
-        ],
+        main: [[{ node: step.onTrue, type: "main", index: 0 }], [{ node: step.onFalse, type: "main", index: 0 }]],
+      };
+    }
+
+    if (step.type === "request") {
+      connections[step.id] = {
+        main: [[{ node: step.next, type: "main", index: 0 }]],
       };
     }
   }
