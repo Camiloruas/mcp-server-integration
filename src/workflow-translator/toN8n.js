@@ -27,7 +27,6 @@ export function translateWorkflowToN8n(workflow) {
   /* =========================
      CRIAR NODES
   ========================= */
-  const nodeByStepId = {};
   let x = 400;
 
   for (const step of workflow.steps) {
@@ -50,6 +49,32 @@ export function translateWorkflowToN8n(workflow) {
               },
             ],
           },
+        },
+      };
+    }
+
+    /* -------- TRANSFORM -------- */
+    if (step.type === "transform") {
+      let functionCode = "";
+
+      if (step.action === "uppercaseMessage") {
+        functionCode = `
+return items.map(item => {
+  const message = item.json.message || "";
+  item.json.message = message.toUpperCase();
+  return item;
+});
+`;
+      }
+
+      node = {
+        id: step.id,
+        name: step.id,
+        type: "n8n-nodes-base.function",
+        typeVersion: 1,
+        position: [x, 300],
+        parameters: {
+          functionCode,
         },
       };
     }
@@ -94,7 +119,6 @@ export function translateWorkflowToN8n(workflow) {
     if (!node) continue;
 
     nodes.push(node);
-    nodeByStepId[step.id] = node;
     x += 200;
   }
 
@@ -114,7 +138,7 @@ export function translateWorkflowToN8n(workflow) {
       };
     }
 
-    if (step.type === "request") {
+    if (step.type === "transform" || step.type === "request") {
       connections[step.id] = {
         main: [[{ node: step.next, type: "main", index: 0 }]],
       };
