@@ -3,6 +3,7 @@ export async function workflowGenerateTool(req, res) {
     const workflow = {
       name: "auto-ping-from-chatgpt",
       active: true,
+      settings: {},
       nodes: [
         {
           id: "Webhook",
