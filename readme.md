@@ -105,7 +105,7 @@ O projeto roda em servidor self-hosted com gerenciamento via Portainer.
 
 Imagem :
 
-I![Imagem dos containers gerenciados via Portainer :](./docs/images/portainer.png)
+![Imagem dos containers gerenciados via Portainer :](./docs/images/portainer.png)
 
 ## Domínios Utilizados
 
