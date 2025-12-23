@@ -24,28 +24,12 @@ Cliente ou IA consome o MCP Server, que por sua vez se comunica com OpenAI, n8n 
 
 ## Estrutura do Projeto
 
-mcp-server/
-├── docker/
-│   └── Dockerfile
-├── docker-compose.yml
-├── docs/
-│   └── images/
-├── src/
-│   ├── index.js
-│   ├── mcpServer.js
-│   └── tools/
-│       ├── ai.js
-│       ├── aiInfo.js
-│       ├── ping.js
-│       ├── callN8nWebhook.js
-│       ├── workflowGenerate.js
-│       └── n8n.js
-├── .env.example
-├── README.md
+![Imagem da estrutura do projeto :](./docs/images/estrutura.png)
 
 ## Execução com Docker
 
 Pré-requisitos:
+
 - Docker
 - Docker Compose
 
@@ -84,6 +68,7 @@ POST /tools/workflow/generate
 Cria workflows automaticamente no n8n.
 
 Funcionalidades:
+
 - Criação dinâmica de workflow
 - Definição automática de webhook
 - Publicação direta no n8n
@@ -92,10 +77,10 @@ Funcionalidades:
 Exemplo de resposta:
 
 {
-  "tool": "workflow-generate",
-  "status": "ok",
-  "workflowId": "jb6tL0eKiPLgehPR",
-  "webhookUrl": "https://webhook.camiloruas.dev/webhook/auto-ping"
+"tool": "workflow-generate",
+"status": "ok",
+"workflowId": "jb6tL0eKiPLgehPR",
+"webhookUrl": "https://webhook.camiloruas.dev/webhook/auto-ping"
 }
 
 Essa funcionalidade permite que agentes de IA criem automações reais no n8n sob demanda.
@@ -118,9 +103,9 @@ Retorna informações de diagnóstico sem consumir tokens.
 
 O projeto roda em servidor self-hosted com gerenciamento via Portainer.
 
-Imagem ilustrativa:
+Imagem :
 
-Inserir imagem em docs/images/portainer.png
+I![Imagem dos containers gerenciados via Portainer :](./docs/images/portainer.png)
 
 ## Domínios Utilizados
 
@@ -158,4 +143,3 @@ LinkedIn:
 https://www.linkedin.com/in/camilo-ruas-3a2a6425/
 
 Projeto em constante evolução.
-
