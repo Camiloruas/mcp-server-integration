@@ -9,7 +9,7 @@ import { workflowTranslateTool } from "./tools/workflowTranslate.js";
 import { workflowPublishTool } from "./tools/workflowPublish.js";
 import { translateTool } from "./tools/translate.js";
 import { workflowGenerateTool } from "./tools/workflowGenerate.js";
-
+import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
 
 export function createMcpServer() {
   const app = express();
@@ -35,7 +35,7 @@ export function createMcpServer() {
   app.post("/tools/workflow/publish", workflowPublishTool);
   app.post("/tools/translate", translateTool);
   app.post("/tools/workflow/generate", workflowGenerateTool);
-
+  app.post("/tools/workflow/run", workflowRunN8nTool);
 
   return app;
 }
