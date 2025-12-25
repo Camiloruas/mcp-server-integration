@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export async function workflowRunN8nTool(req, res) {
   try {
     const { input } = req.body || {};
@@ -24,24 +22,33 @@ export async function workflowRunN8nTool(req, res) {
       });
     }
 
-    const response = await axios.post(`${n8nBaseUrl}/api/v1/workflows/${workflowId}/run`, data || {}, {
+    const response = await fetch(`${n8nBaseUrl}/api/v1/workflows/${workflowId}/run`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-N8N-API-KEY": apiKey,
       },
+      body: JSON.stringify(data || {}),
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`n8n error ${response.status}: ${text}`);
+    }
+
+    const responseData = await response.json();
 
     return res.json({
       tool: "workflow-run",
       status: "ok",
       workflowId,
-      executionId: response.data?.id || null,
+      executionId: responseData?.id || null,
     });
   } catch (error) {
     return res.status(500).json({
       tool: "workflow-run",
       status: "error",
-      message: error.response?.data || error.message,
+      message: error.message,
     });
   }
 }
