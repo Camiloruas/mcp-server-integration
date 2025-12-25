@@ -10,7 +10,6 @@ import { workflowPublishTool } from "./tools/workflowPublish.js";
 import { translateTool } from "./tools/translate.js";
 import { workflowGenerateTool } from "./tools/workflowGenerate.js";
 
-
 export function createMcpServer() {
   const app = express();
 
@@ -30,7 +29,7 @@ export function createMcpServer() {
   app.post("/tools/ai", aiTool);
   app.get("/tools/ai/info", aiInfoTool);
   app.post("/webhook/evolution", evolutionWebhookTool);
-  app.post("/tools/workflow/run", workflowRunTool);
+  app.post("/tools/workflow/run", workflowRunN8nTool);
   app.get("/tools/workflow/translate", workflowTranslateTool);
   app.post("/tools/workflow/publish", workflowPublishTool);
   app.post("/tools/translate", translateTool);
