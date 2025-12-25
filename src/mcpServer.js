@@ -4,12 +4,12 @@ import { callN8nWebhook } from "./tools/callN8nWebhook.js";
 import { aiTool } from "./tools/ai.js";
 import { aiInfoTool } from "./tools/aiInfo.js";
 import { evolutionWebhookTool } from "./tools/evolutionWebhook.js";
-import { workflowRunTool } from "./tools/workflowRun.js";
+import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
 import { workflowTranslateTool } from "./tools/workflowTranslate.js";
 import { workflowPublishTool } from "./tools/workflowPublish.js";
 import { translateTool } from "./tools/translate.js";
 import { workflowGenerateTool } from "./tools/workflowGenerate.js";
-import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
+
 
 export function createMcpServer() {
   const app = express();
