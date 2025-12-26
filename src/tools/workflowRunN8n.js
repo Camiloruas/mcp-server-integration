@@ -1,48 +1,37 @@
 export async function workflowRunN8nTool(req, res) {
   try {
     const { input } = req.body || {};
-    const { workflowId, data } = input || {};
+    const { webhookUrl, data } = input || {};
 
-    if (!workflowId) {
+    if (!webhookUrl) {
       return res.status(400).json({
         tool: "workflow-run",
         status: "error",
-        message: "workflowId is required",
+        message: "webhookUrl is required",
       });
     }
 
-    const n8nBaseUrl = process.env.N8N_BASE_URL;
-    const apiKey = process.env.N8N_API_KEY;
-
-    if (!n8nBaseUrl || !apiKey) {
-      return res.status(500).json({
-        tool: "workflow-run",
-        status: "error",
-        message: "N8N_BASE_URL or N8N_API_KEY not configured",
-      });
-    }
-
-    const response = await fetch(`${n8nBaseUrl}/api/v1/workflows/${workflowId}/run`, {
+    // Executa via Webhook conforme decisão arquitetural
+    const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-N8N-API-KEY": apiKey,
       },
       body: JSON.stringify(data || {}),
     });
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`n8n error ${response.status}: ${text}`);
+      throw new Error(`n8n webhook error ${response.status}: ${text}`);
     }
 
-    const responseData = await response.json();
+    const responseData = await response.json().catch(() => ({ status: "ok" }));
 
     return res.json({
       tool: "workflow-run",
       status: "ok",
-      workflowId,
-      executionId: responseData?.id || null,
+      webhookUrl,
+      result: responseData,
     });
   } catch (error) {
     return res.status(500).json({

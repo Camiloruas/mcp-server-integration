@@ -126,9 +126,8 @@ A exposição externa é feita via Cloudflare Tunnel.
 
 ## Próximas Etapas
 
-- Criação de tool para execução de workflows
+- Validação completa do fluxo via Webhook
 - Integração MCP com ChatGPT via conversation
-- Geração de workflows a partir de linguagem natural
 - Autenticação de endpoints
 - Observabilidade e logs estruturados
 

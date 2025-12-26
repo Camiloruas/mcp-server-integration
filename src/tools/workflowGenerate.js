@@ -1,49 +1,28 @@
 export async function workflowGenerateTool(req, res) {
   try {
+    const { input } = req.body || {};
+    // Agora aceita estrutura dinâmica do ChatGPT
+    const { name, nodes, connections, settings } = input || {};
+
+    if (!nodes || !connections) {
+      return res.status(400).json({
+        tool: "workflow-generate",
+        status: "error",
+        message: "nodes and connections are required",
+      });
+    }
+
     const workflow = {
-      name: "auto-ping-from-chatgpt",
-      settings: {},
-      nodes: [
-        {
-          id: "Webhook",
-          name: "Webhook",
-          type: "n8n-nodes-base.webhook",
-          typeVersion: 2,
-          position: [0, 0],
-          parameters: {
-            httpMethod: "POST",
-            path: "auto-ping",
-            responseMode: "responseNode",
-          },
-        },
-        {
-          id: "Respond to Webhook",
-          name: "Respond to Webhook",
-          type: "n8n-nodes-base.respondToWebhook",
-          typeVersion: 1,
-          position: [240, 0],
-          parameters: {
-            respondWith: "json",
-            responseBody: JSON.stringify({ result: "pong" }),
-          },
-        },
-      ],
-      connections: {
-        Webhook: {
-          main: [
-            [
-              {
-                node: "Respond to Webhook",
-                type: "main",
-                index: 0,
-              },
-            ],
-          ],
-        },
-      },
+      name: name || `workflow-generated-${Date.now()}`,
+      nodes: nodes,
+      connections: connections,
+      settings: settings || {},
+      active: true, // Já cria ativado por padrão
     };
 
-    const response = await fetch("http://n8n:5678/api/v1/workflows", {
+    console.log(`[workflowGenerate] Creating workflow: ${workflow.name}`);
+
+    const response = await fetch(`${process.env.N8N_BASE_URL}/api/v1/workflows`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -59,11 +38,26 @@ export async function workflowGenerateTool(req, res) {
 
     const data = await response.json();
 
+    // Tenta encontrar o Webhook URL se houver um node de webhook
+    let webhookUrl = null;
+    const webhookNode = nodes.find(n => n.type.includes("webhook"));
+
+    if (webhookNode) {
+      // Construção básica da URL, dependendo de como o n8n está exposto
+      // Aqui assumimos o padrão de produção ou tunel
+      const path = webhookNode.parameters?.path || "";
+      const method = webhookNode.parameters?.httpMethod || "GET";
+      if (path) {
+        webhookUrl = `${process.env.N8N_WEBHOOK_URL}/${path}`;
+      }
+    }
+
     res.json({
       tool: "workflow-generate",
       status: "ok",
       workflowId: data.id,
-      webhookUrl: "https://webhook.camiloruas.dev/webhook/auto-ping",
+      name: data.name,
+      webhookUrl: webhookUrl || "Check n8n UI for details",
     });
   } catch (err) {
     console.error("workflowGenerate error:", err);

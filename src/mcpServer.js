@@ -5,9 +5,6 @@ import { aiTool } from "./tools/ai.js";
 import { aiInfoTool } from "./tools/aiInfo.js";
 import { evolutionWebhookTool } from "./tools/evolutionWebhook.js";
 import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
-import { workflowTranslateTool } from "./tools/workflowTranslate.js";
-import { workflowPublishTool } from "./tools/workflowPublish.js";
-import { translateTool } from "./tools/translate.js";
 import { workflowGenerateTool } from "./tools/workflowGenerate.js";
 
 export function createMcpServer() {
@@ -30,11 +27,7 @@ export function createMcpServer() {
   app.get("/tools/ai/info", aiInfoTool);
   app.post("/webhook/evolution", evolutionWebhookTool);
   app.post("/tools/workflow/run", workflowRunN8nTool);
-  app.get("/tools/workflow/translate", workflowTranslateTool);
-  app.post("/tools/workflow/publish", workflowPublishTool);
-  app.post("/tools/translate", translateTool);
   app.post("/tools/workflow/generate", workflowGenerateTool);
-  app.post("/tools/workflow/run", workflowRunN8nTool);
 
   return app;
 }

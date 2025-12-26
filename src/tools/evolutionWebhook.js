@@ -1,4 +1,4 @@
-import { n8nTool } from "./n8n.js";
+
 
 export async function evolutionWebhookTool(req, res) {
   console.log("EVOLUTION WEBHOOK RECEIVED");
@@ -19,12 +19,23 @@ export async function evolutionWebhookTool(req, res) {
       data: event.data || event,
     };
 
-    n8nTool({
-      action: "evolution-event",
-      data: payload,
-    }).catch((err) => {
-      console.error(" Error forwarding to n8n:", err.message);
-    });
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
+    if (n8nWebhookUrl) {
+      fetch(n8nWebhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "mcp-server",
+          action: "evolution-event",
+          data: payload,
+          timestamp: new Date().toISOString()
+        })
+      }).catch((err) => {
+        console.error(" Error forwarding to n8n:", err.message);
+      });
+    } else {
+      console.warn("⚠️ N8N_WEBHOOK_URL not configured, skipping forward to n8n");
+    }
 
     return res.status(200).json({ ok: true });
   } catch (err) {
