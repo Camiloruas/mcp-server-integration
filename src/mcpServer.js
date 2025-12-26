@@ -1,4 +1,5 @@
 import express from "express";
+import { authMiddleware } from "./middlewares/auth.js";
 import { pingTool } from "./tools/ping.js";
 import { callN8nWebhook } from "./tools/callN8nWebhook.js";
 import { aiTool } from "./tools/ai.js";
@@ -20,8 +21,12 @@ export function createMcpServer() {
       timestamp: new Date().toISOString(),
     });
   });
-
+  // Rotas abertas
   app.get("/tools/ping", pingTool);
+
+  // Rotas seguras -  Middleware aplicado A PARTIR DAQUI
+  app.use(authMiddleware);
+
   app.post("/tools/n8n", callN8nWebhook);
   app.post("/tools/ai", aiTool);
   app.get("/tools/ai/info", aiInfoTool);
