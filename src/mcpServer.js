@@ -1,5 +1,6 @@
 import express from "express";
 import { authMiddleware } from "./middlewares/auth.js";
+import { rateLimitMiddleware } from "./middlewares/rateLimit.js";
 import { pingTool } from "./tools/ping.js";
 import { callN8nWebhook } from "./tools/callN8nWebhook.js";
 import { aiTool } from "./tools/ai.js";
@@ -26,6 +27,7 @@ export function createMcpServer() {
 
   // Rotas seguras -  Middleware aplicado A PARTIR DAQUI
   app.use(authMiddleware);
+  app.use(rateLimitMiddleware);
 
   app.post("/tools/n8n", callN8nWebhook);
   app.post("/tools/ai", aiTool);
