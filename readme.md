@@ -1,16 +1,16 @@
 # MCP Server Integration
 
-Este repositório demonstra a integração de um MCP Server (Model Context Protocol) com OpenAI, n8n e outros serviços, rodando em ambiente Docker, com foco em aprendizado prático, arquitetura real e boas práticas de backend.
+Este repositório demonstra a integração de um MCP Server (Model Context Protocol) com OpenAI, n8n e outros serviços, rodando em ambiente Docker, com código enxuto, arquitetura real e boas práticas de backend e segurança.
 
-O projeto foi desenvolvido como um ambiente real de estudos, simulando cenários de produção com uso de containers, variáveis de ambiente, fallback de IA, timeout, retry e observabilidade básica.
+O projeto foi desenvolvido como um ambiente real de estudos, simulando cenários de produção com uso de containers, variáveis de ambiente, fallback de IA, timeout, retry, observabilidade básica e proteção de rotas.
 
 ## Objetivo do Projeto
 
 - Implementar um MCP Server centralizado em Node.js
-- Expor ferramentas MCP via REST
-- Integrar o MCP com OpenAI e n8n
+- Expor ferramentas MCP via REST com segurança
+- Integrar o MCP com OpenAI, n8n e Evolution API
 - Demonstrar uso de Docker e Docker Compose
-- Aplicar boas práticas de organização, resiliência e documentação
+- Aplicar middlewares de autenticação e controle de taxa (Rate Limit)
 
 ## O que é um MCP Server
 
@@ -20,7 +20,7 @@ O MCP Server atua como uma camada intermediária responsável por centralizar in
 
 ## Arquitetura Geral
 
-Cliente ou IA consome o MCP Server, que por sua vez se comunica com OpenAI, n8n e APIs externas.
+Cliente ou IA consome o MCP Server, que por sua vez se comunica com OpenAI, n8n e APIs externas. O acesso às ferramentas críticas é protegido por validação de chave de API.
 
 ## Estrutura do Projeto
 
@@ -41,27 +41,70 @@ Para acompanhar os logs:
 
 docker compose logs -f mcp-server
 
-## Ferramentas Disponíveis
+## Segurança e Middlewares
 
-### Health Check
+O projeto implementa middlewares para garantir a robustez e segurança da aplicação.
+
+### Autenticação (Auth Middleware)
+
+As rotas sensíveis são protegidas e exigem o cabeçalho `x-api-key`.
+A validação é feita via variável de ambiente `MCP_API_KEYS`.
+
+### Rate Limit
+
+Middleware aplicado para prevenir abuso da API, limitando o número de requisições por IP em um determinado intervalo de tempo.
+
+## Ferramentas e Rotas Disponíveis
+
+### Rotas Públicas
+
+#### Health Check
 
 GET /
 
-Retorna o status do MCP Server.
+Retorna o status do MCP Server e versão atual.
 
-### Ping
+#### Ping
 
 GET /tools/ping
 
 Teste simples de conectividade.
 
-### Integração com n8n
+### Rotas Protegidas (Requer x-api-key)
+
+#### Integração com n8n
 
 POST /tools/n8n
 
 Permite disparar webhooks do n8n a partir do MCP Server.
 
-### Geração Automática de Workflow no n8n
+#### Tool de IA
+
+POST /tools/ai
+
+- Integração com OpenAI
+- Fallback automático
+- Timeout e retry configurados
+
+#### Diagnóstico da IA
+
+GET /tools/ai/info
+
+Retorna informações de diagnóstico sem consumir tokens.
+
+#### Webhook Evolution
+
+POST /webhook/evolution
+
+Recebe e processa eventos da Evolution API.
+
+#### Execução de Workflow
+
+POST /tools/workflow/run
+
+Executa um workflow específico no n8n.
+
+#### Geração Automática de Workflow no n8n
 
 POST /tools/workflow/generate
 
@@ -83,22 +126,6 @@ Exemplo de resposta:
 "webhookUrl": "https://webhook.camiloruas.dev/webhook/auto-ping"
 }
 
-Essa funcionalidade permite que agentes de IA criem automações reais no n8n sob demanda.
-
-### Tool de IA
-
-POST /tools/ai
-
-- Integração com OpenAI
-- Fallback automático
-- Timeout e retry configurados
-
-### Diagnóstico da IA
-
-GET /tools/ai/info
-
-Retorna informações de diagnóstico sem consumir tokens.
-
 ## Containers em Execução
 
 O projeto roda em servidor self-hosted com gerenciamento via Portainer.
@@ -118,18 +145,11 @@ A exposição externa é feita via Cloudflare Tunnel.
 
 ## Boas Práticas Aplicadas
 
+- Arquitetura enxuta
 - Variáveis sensíveis fora do versionamento
-- Arquivo .env.example para referência
+- Middlewares de segurança (Auth, Rate Limit)
 - Containers isolados
 - Fallback de IA
-- Organização por responsabilidade
-
-## Próximas Etapas
-
-- Validação completa do fluxo via Webhook
-- Integração MCP com ChatGPT via conversation
-- Autenticação de endpoints
-- Observabilidade e logs estruturados
 
 ## Autor
 
