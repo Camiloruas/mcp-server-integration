@@ -1,7 +1,6 @@
 export async function workflowGenerateTool(req, res) {
   try {
     const { input } = req.body || {};
-    // Agora aceita estrutura dinâmica do ChatGPT
     const { name, nodes, connections, settings } = input || {};
 
     if (!nodes || !connections) {
@@ -12,16 +11,17 @@ export async function workflowGenerateTool(req, res) {
       });
     }
 
+    // ❌ NÃO pode enviar `active` aqui
     const workflow = {
       name: name || `workflow-generated-${Date.now()}`,
-      nodes: nodes,
-      connections: connections,
+      nodes,
+      connections,
       settings: settings || {},
-      active: true, // Já cria ativado por padrão
     };
 
     console.log(`[workflowGenerate] Creating workflow: ${workflow.name}`);
 
+    // 1️⃣ Cria o workflow
     const response = await fetch(`${process.env.N8N_BASE_URL}/api/v1/workflows`, {
       method: "POST",
       headers: {
@@ -38,15 +38,24 @@ export async function workflowGenerateTool(req, res) {
 
     const data = await response.json();
 
-    // Tenta encontrar o Webhook URL se houver um node de webhook
+    // 2️⃣ ATIVA o workflow (chamada separada — isso é permitido)
+    try {
+      await fetch(`${process.env.N8N_BASE_URL}/api/v1/workflows/${data.id}/activate`, {
+        method: "POST",
+        headers: {
+          "X-N8N-API-KEY": process.env.N8N_API_KEY,
+        },
+      });
+    } catch (activateErr) {
+      console.warn(`[workflowGenerate] Workflow created but not activated: ${activateErr.message}`);
+    }
+
+    // 3️⃣ Monta webhook URL (sua lógica preservada)
     let webhookUrl = null;
-    const webhookNode = nodes.find(n => n.type.includes("webhook"));
+    const webhookNode = nodes.find((n) => n.type?.includes("webhook"));
 
     if (webhookNode) {
-      // Construção básica da URL, dependendo de como o n8n está exposto
-      // Aqui assumimos o padrão de produção ou tunel
       const path = webhookNode.parameters?.path || "";
-      const method = webhookNode.parameters?.httpMethod || "GET";
       if (path) {
         webhookUrl = `${process.env.N8N_WEBHOOK_URL}/${path}`;
       }
@@ -58,6 +67,7 @@ export async function workflowGenerateTool(req, res) {
       workflowId: data.id,
       name: data.name,
       webhookUrl: webhookUrl || "Check n8n UI for details",
+      active: true,
     });
   } catch (err) {
     console.error("workflowGenerate error:", err);
