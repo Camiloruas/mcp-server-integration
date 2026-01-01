@@ -9,6 +9,7 @@ import { aiInfoTool } from "./tools/aiInfo.js";
 import { evolutionWebhookTool } from "./tools/evolutionWebhook.js";
 import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
 import { workflowGenerateTool } from "./tools/workflowGenerate.js";
+import { agentWorkflowFromText } from "./tools/agentWorkflowFromText.js";
 
 export function createMcpServer() {
   const app = express();
@@ -49,6 +50,8 @@ export function createMcpServer() {
 
   // (opcional) endpoint genérico n8n
   app.post("/tools/n8n", authMiddleware("workflow:run"), callN8nWebhook);
+
+  app.post("/agent/workflow/from-text", authMiddleware("workflow:generate"), agentWorkflowFromText);
 
   return app;
 }
