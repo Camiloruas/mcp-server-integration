@@ -23,6 +23,7 @@ O projeto não é limitado a uma única plataforma. O n8n é utilizado como **um
 O **Model Context Protocol (MCP)** define uma forma estruturada para que agentes de IA utilizem ferramentas externas de maneira controlada, auditável e segura.
 
 Neste projeto, o MCP Server atua como:
+
 - Camada intermediária entre IA e ferramentas
 - Controlador de permissões e escopos
 - Orquestrador de chamadas e fluxos
@@ -74,15 +75,18 @@ A pasta `tools` é extensível e pode receber integrações com qualquer tipo de
 ## Execução com Docker
 
 Pré-requisitos:
+
 - Docker
 - Docker Compose
 
 Subir o ambiente:
+
 ```bash
 docker compose up -d
 ```
 
 Ver logs:
+
 ```bash
 docker compose logs -f mcp-server
 ```
@@ -96,11 +100,13 @@ docker compose logs -f mcp-server
 O acesso ao MCP Server é controlado por múltiplas API keys, definidas via variável de ambiente.
 
 Cada chave possui:
+
 - Nome
 - Status ativo ou inativo
 - Lista de escopos permitidos
 
 Exemplo conceitual:
+
 ```json
 [
   { "name": "admin", "scopes": ["*"] },
@@ -116,10 +122,11 @@ Exemplo conceitual:
 Cada endpoint exige um escopo específico, garantindo que cada integração tenha acesso apenas ao necessário.
 
 Exemplos de escopos:
+
 - workflow:run
 - workflow:generate
 - ai:use
-- admin:*
+- admin:\*
 
 ---
 
@@ -148,6 +155,7 @@ Um endpoint experimental permite que agentes de IA gerem estruturas de automaç�
 ## Extensibilidade
 
 A arquitetura foi desenhada para facilitar a adição de novas tools, como:
+
 - Integrações com APIs externas
 - Serviços internos
 - Ferramentas de infraestrutura
@@ -172,5 +180,6 @@ Camilo Ruas
 
 GitHub: https://github.com/Camiloruas  
 LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/
+Portfólio: [camiloruas.dev](https://www.camiloruas.dev/)
 
 Este projeto está em evolução contínua e serve como base para estudos, automações e aplicações reais utilizando MCP, IA e integração de serviços.
