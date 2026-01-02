@@ -1,24 +1,31 @@
 FROM node:20-alpine
 
-# Criamos um usuário não-root (boa prática de segurança)
+# Criar usuário não-root
 RUN addgroup -S app && adduser -S app -G app
 
 WORKDIR /app
 
-# Copia apenas o necessário primeiro (cache eficiente)
+# Copiar manifests
 COPY package*.json ./
 
-# Instala apenas dependências de produção
-RUN npm install --omit=dev
+# Instalar TODAS as dependências (inclui typescript)
+RUN npm install
 
-# Copia o restante do código
-COPY . .
+# Copiar código-fonte e config TS
+COPY tsconfig.json ./
+COPY src ./src
 
-# Ajusta permissões
+# Build TypeScript
+RUN npm run build
+
+# Remover devDependencies após o build (opcional, mas elegante)
+RUN npm prune --omit=dev
+
+# Ajustar permissões
 RUN chown -R app:app /app
 
 USER app
 
-EXPOSE 3000
+EXPOSE 3333
 
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
