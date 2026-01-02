@@ -9,7 +9,7 @@ import { aiInfoTool } from "./tools/ai/aiInfo.js";
 import { evolutionWebhookTool } from "./tools/evolution/evolutionWebhook.js";
 import { workflowRunN8nTool } from "./tools/n8n/workflowRunN8n.js";
 import { workflowGenerateTool } from "./tools/n8n/workflowGenerate.js";
-import { agentWorkflowFromText } from "./tools/n8n/agentWorkflowFromText.js";
+import { agentWorkflowFromText } from "./agents/agentWorkflowFromText.js";
 import { createGitHubIssueTool } from "./tools/github/createIssue.js";
 export function createMcpServer(): Express {
   const app = express();
