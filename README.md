@@ -198,8 +198,8 @@ Nenhuma ferramenta externa é acessada diretamente pela IA.
 
 Camilo Ruas
 
-GitHub: https://github.com/Camiloruas
-LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/
-Portfólio: [camiloruas.dev](https://www.camiloruas.dev/)
+GitHub: https://github.com/Camiloruas  
+LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/  
+Portfólio: [camiloruas.dev](https://www.camiloruas.dev/)  
 
 Este projeto está em evolução contínua e serve como base para estudos, automações e aplicações reais utilizando MCP, IA e integração de serviços.
