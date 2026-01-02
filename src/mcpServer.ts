@@ -1,16 +1,16 @@
 import express, { Express, Request, Response } from "express";
-import { authMiddleware } from "./middlewares/auth.ts";
-import { rateLimitMiddleware } from "./middlewares/rateLimit.ts";
+import { authMiddleware } from "./middlewares/auth.js";
+import { rateLimitMiddleware } from "./middlewares/rateLimit.js";
 
-import { pingTool } from "./tools/system/ping.ts";
-import { callN8nWebhook } from "./tools/n8n/callN8nWebhook.ts";
-import { aiTool } from "./tools/ai/ai.ts";
-import { aiInfoTool } from "./tools/ai/aiInfo.ts";
-import { evolutionWebhookTool } from "./tools/evolution/evolutionWebhook.ts";
-import { workflowRunN8nTool } from "./tools/n8n/workflowRunN8n.ts";
-import { workflowGenerateTool } from "./tools/n8n/workflowGenerate.ts";
-import { agentWorkflowFromText } from "./tools/n8n/agentWorkflowFromText.ts";
-import { createGitHubIssueTool } from "./tools/github/createIssue.ts";
+import { pingTool } from "./tools/system/ping.js";
+import { callN8nWebhook } from "./tools/n8n/callN8nWebhook.js";
+import { aiTool } from "./tools/ai/ai.js";
+import { aiInfoTool } from "./tools/ai/aiInfo.js";
+import { evolutionWebhookTool } from "./tools/evolution/evolutionWebhook.js";
+import { workflowRunN8nTool } from "./tools/n8n/workflowRunN8n.js";
+import { workflowGenerateTool } from "./tools/n8n/workflowGenerate.js";
+import { agentWorkflowFromText } from "./tools/n8n/agentWorkflowFromText.js";
+import { createGitHubIssueTool } from "./tools/github/createIssue.js";
 export function createMcpServer(): Express {
   const app = express();
   app.set("trust proxy", 1);
