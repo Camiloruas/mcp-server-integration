@@ -1,4 +1,7 @@
-export async function workflowRunN8nTool(req, res) {
+import { Request, Response } from "express";
+import fetch from "node-fetch";
+
+export async function workflowRunN8nTool(req: Request, res: Response) {
   try {
     const { input } = req.body || {};
     const { webhookUrl, data } = input || {};
@@ -37,7 +40,7 @@ export async function workflowRunN8nTool(req, res) {
     return res.status(500).json({
       tool: "workflow-run",
       status: "error",
-      message: error.message,
+      message: (error as Error).message,
     });
   }
 }

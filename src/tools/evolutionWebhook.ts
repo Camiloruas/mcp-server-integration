@@ -1,6 +1,9 @@
 
 
-export async function evolutionWebhookTool(req, res) {
+import { Request, Response } from "express";
+import fetch from "node-fetch";
+
+export async function evolutionWebhookTool(req: Request, res: Response) {
   console.log("EVOLUTION WEBHOOK RECEIVED");
   console.log(JSON.stringify(req.body, null, 2));
 

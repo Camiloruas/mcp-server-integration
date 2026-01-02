@@ -1,11 +1,27 @@
-function hasScope(scopes = [], required) {
+import { Request, Response, NextFunction } from "express";
+
+export interface ApiKeyConfig {
+  name: string;
+  key: string;
+  active: boolean;
+  scopes?: string[];
+}
+
+export interface AuthenticatedRequest extends Request {
+  apiKey?: {
+    name: string;
+    scopes: string[];
+  };
+}
+
+function hasScope(scopes: string[] = [], required: string): boolean {
   if (scopes.includes("*") || scopes.includes("admin:*")) return true;
   return scopes.includes(required);
 }
 
-export function authMiddleware(requiredScope = null) {
-  return function (req, res, next) {
-    const apiKeyHeader = req.headers["x-api-key"];
+export function authMiddleware(requiredScope: string | null = null) {
+  return function (req: Request, res: Response, next: NextFunction) {
+    const apiKeyHeader = req.headers["x-api-key"] as string | undefined;
 
     if (!apiKeyHeader) {
       return res.status(401).json({ error: "Missing API key" });
@@ -16,7 +32,7 @@ export function authMiddleware(requiredScope = null) {
       return res.status(500).json({ error: "Server auth not configured" });
     }
 
-    let apiKeys;
+    let apiKeys: ApiKeyConfig[];
     try {
       apiKeys = JSON.parse(process.env.MCP_API_KEYS);
     } catch (err) {
@@ -44,7 +60,7 @@ export function authMiddleware(requiredScope = null) {
     }
 
     // Anexa info da key à request (útil para logs)
-    req.apiKey = {
+    (req as AuthenticatedRequest).apiKey = {
       name: matchedKey.name,
       scopes: matchedKey.scopes || [],
     };

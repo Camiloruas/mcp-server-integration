@@ -1,9 +1,16 @@
+import { Request, Response } from "express";
 import { workflowGenerateTool } from "./workflowGenerate.js";
 import { callOpenAI } from "../services/openai.js";
+import { McpToolRequest } from "../types/mcp.js";
 
-export async function agentWorkflowFromText(req, res) {
+interface AgentInput {
+  text: string;
+}
+
+export async function agentWorkflowFromText(req: Request<{}, {}, McpToolRequest<AgentInput>>, res: Response) {
   try {
-    const { text } = req.body || {};
+    const { input } = req.body || {};
+    const text = input?.text;
 
     if (!text) {
       return res.status(400).json({
@@ -30,6 +37,10 @@ Formato:
       user: text
     });
 
+    if (!aiResponse) {
+      throw new Error("No response from AI");
+    }
+
     let workflowJson;
     try {
       workflowJson = JSON.parse(aiResponse);
@@ -38,14 +49,18 @@ Formato:
     }
 
     // 3️⃣ Reencaminha para a tool real
+    // Como estamos reutilizando a função, precisamos adaptar o body para corresponder ao contrato de workflowGenerate
     req.body.input = workflowJson;
 
+    // TypeScript pode reclamar aqui porque estamos "enganando" o compilador ao mudar o body
+    // Mas em runtime (Express) é válido.
+    // @ts-ignore
     return workflowGenerateTool(req, res);
   } catch (err) {
     console.error("agentWorkflowFromText error:", err);
 
     return res.status(500).json({
-      error: err.message
+      error: (err as Error).message
     });
   }
 }

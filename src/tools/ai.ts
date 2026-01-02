@@ -1,6 +1,12 @@
+import { Request, Response } from "express";
 import OpenAI from "openai";
+import { McpToolRequest } from "../types/mcp.js";
 
-function getOpenAIClient() {
+interface AiInput {
+  prompt: string;
+}
+
+function getOpenAIClient(): OpenAI | null {
   if (process.env.AI_MODE !== "openai") return null;
 
   if (!process.env.OPENAI_API_KEY) {
@@ -13,7 +19,7 @@ function getOpenAIClient() {
   });
 }
 
-function mockResponse(prompt, reason = "mock") {
+function mockResponse(prompt: string, reason = "mock") {
   return {
     tool: "ai",
     status: "ok",
@@ -25,7 +31,7 @@ function mockResponse(prompt, reason = "mock") {
   };
 }
 
-async function callOpenAIWithRetry(client, payload, retries = 1) {
+async function callOpenAIWithRetry(client: OpenAI, payload: any, retries = 1): Promise<any> {
   try {
     return await client.chat.completions.create(payload);
   } catch (error) {
@@ -37,8 +43,9 @@ async function callOpenAIWithRetry(client, payload, retries = 1) {
   }
 }
 
-export async function aiTool(req, res) {
-  const { prompt } = req.body;
+export async function aiTool(req: Request<{}, {}, McpToolRequest<AiInput>>, res: Response) {
+  const { input } = req.body || {};
+  const prompt = input?.prompt;
 
   if (!prompt) {
     return res.status(400).json({
@@ -61,6 +68,7 @@ export async function aiTool(req, res) {
   /* OPENAI COM TIMEOUT + RETRY + FALLBACK */
   try {
     const client = getOpenAIClient();
+    if (!client) throw new Error("Client initialization failed");
 
     const payload = {
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
@@ -82,8 +90,9 @@ export async function aiTool(req, res) {
       response: completion.choices[0].message.content,
     });
   } catch (error) {
-    console.error("OPENAI ERROR — fallback to mock:", error.message);
+    const errorMsg = (error as Error).message;
+    console.error("OPENAI ERROR — fallback to mock:", errorMsg);
 
-    return res.json(mockResponse(prompt, error.message));
+    return res.json(mockResponse(prompt, errorMsg));
   }
 }

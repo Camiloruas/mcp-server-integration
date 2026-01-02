@@ -1,7 +1,24 @@
-export async function workflowGenerateTool(req, res) {
+import { Request, Response } from "express";
+import fetch from "node-fetch";
+import { McpToolRequest, WorkflowInput } from "../types/mcp.js";
+
+export async function workflowGenerateTool(
+  req: Request<{}, {}, McpToolRequest<WorkflowInput>>,
+  res: Response
+) {
   try {
     const { input } = req.body || {};
-    const { name, nodes, connections, settings } = input || {};
+    // Input pode ser undefined se o body estiver mal formado, mas assumindo middleware json
+
+    if (!input) {
+      return res.status(400).json({
+        tool: "workflow-generate",
+        status: "error",
+        message: "Missing input object"
+      });
+    }
+
+    const { name, nodes, connections, settings } = input;
 
     if (!nodes || !connections) {
       return res.status(400).json({
@@ -26,7 +43,7 @@ export async function workflowGenerateTool(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-N8N-API-KEY": process.env.N8N_API_KEY,
+        "X-N8N-API-KEY": process.env.N8N_API_KEY || "",
       },
       body: JSON.stringify(workflow),
     });
@@ -36,23 +53,23 @@ export async function workflowGenerateTool(req, res) {
       throw new Error(`n8n error: ${text}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
 
     // 2️⃣ ATIVA o workflow (chamada separada — isso é permitido)
     try {
       await fetch(`${process.env.N8N_BASE_URL}/api/v1/workflows/${data.id}/activate`, {
         method: "POST",
         headers: {
-          "X-N8N-API-KEY": process.env.N8N_API_KEY,
+          "X-N8N-API-KEY": process.env.N8N_API_KEY || "",
         },
       });
     } catch (activateErr) {
-      console.warn(`[workflowGenerate] Workflow created but not activated: ${activateErr.message}`);
+      console.warn(`[workflowGenerate] Workflow created but not activated: ${(activateErr as Error).message}`);
     }
 
     // 3️⃣ Monta webhook URL (sua lógica preservada)
     let webhookUrl = null;
-    const webhookNode = nodes.find((n) => n.type?.includes("webhook"));
+    const webhookNode = nodes.find((n: any) => n.type?.includes("webhook"));
 
     if (webhookNode) {
       const path = webhookNode.parameters?.path || "";
@@ -75,7 +92,7 @@ export async function workflowGenerateTool(req, res) {
     res.status(500).json({
       tool: "workflow-generate",
       status: "error",
-      message: err.message,
+      message: (err as Error).message,
     });
   }
 }

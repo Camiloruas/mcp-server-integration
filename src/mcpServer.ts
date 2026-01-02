@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Express, Request, Response } from "express";
 import { authMiddleware } from "./middlewares/auth.js";
 import { rateLimitMiddleware } from "./middlewares/rateLimit.js";
 
@@ -11,13 +11,13 @@ import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
 import { workflowGenerateTool } from "./tools/workflowGenerate.js";
 import { agentWorkflowFromText } from "./tools/agentWorkflowFromText.js";
 
-export function createMcpServer() {
+export function createMcpServer(): Express {
   const app = express();
 
   app.use(express.json());
 
   // Health check
-  app.get("/", (req, res) => {
+  app.get("/", (req: Request, res: Response) => {
     res.json({
       service: "MCP Server",
       status: "ok",

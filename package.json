@@ -2,11 +2,12 @@
   "name": "mcp-server-integration",
   "version": "1.0.0",
   "description": "Integração de um MCP Server (Model Context Protocol) com n8n, Ollama e outros serviços, rodando em Docker.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node src/index.js",
+    "start": "node dist/index.js",
+    "dev": "ts-node --esm src/index.ts",
+    "build": "tsc",
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
@@ -24,5 +25,13 @@
     "url": "https://github.com/Camiloruas/mcp-server-integration/issues"
   },
   "homepage": "https://github.com/Camiloruas/mcp-server-integration#readme",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/express-rate-limit": "^5.1.3",
+    "@types/node": "^25.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
 }

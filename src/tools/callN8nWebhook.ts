@@ -1,8 +1,9 @@
+import { Request, Response } from "express";
 import fetch from "node-fetch";
 
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 
-export async function callN8nWebhook(req, res) {
+export async function callN8nWebhook(req: Request, res: Response) {
   try {
     if (!N8N_WEBHOOK_URL) {
       return res.status(500).json({
@@ -36,7 +37,7 @@ export async function callN8nWebhook(req, res) {
     res.status(500).json({
       tool: "n8n",
       status: "error",
-      message: error.message
+      message: (error as Error).message
     });
   }
 }

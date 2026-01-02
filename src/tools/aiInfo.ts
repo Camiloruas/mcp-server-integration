@@ -1,4 +1,6 @@
-export function aiInfoTool(req, res) {
+import { Request, Response } from "express";
+
+export function aiInfoTool(req: Request, res: Response) {
   const isOpenAI = process.env.AI_MODE === "openai";
 
   res.json({

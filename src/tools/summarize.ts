@@ -1,4 +1,9 @@
-export async function summarizeTool(input) {
+interface SummarizeInput {
+  text: string;
+  max_sentences?: number;
+}
+
+export async function summarizeTool(input: SummarizeInput) {
   const max = input.max_sentences ?? 3;
 
   const sentences = input.text
