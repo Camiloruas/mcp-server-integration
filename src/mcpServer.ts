@@ -13,7 +13,7 @@ import { agentWorkflowFromText } from "./tools/agentWorkflowFromText.js";
 
 export function createMcpServer(): Express {
   const app = express();
-
+  app.set("trust proxy", 1);
   app.use(express.json());
 
   // Health check
