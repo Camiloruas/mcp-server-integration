@@ -1,11 +1,8 @@
 import { Request, Response } from "express";
 import fetch from "node-fetch";
-import { McpToolRequest, WorkflowInput } from "../types/mcp.js";
+import { McpToolRequest, WorkflowInput } from "../../types/mcp.js";
 
-export async function workflowGenerateTool(
-  req: Request<{}, {}, McpToolRequest<WorkflowInput>>,
-  res: Response
-) {
+export async function workflowGenerateTool(req: Request<{}, {}, McpToolRequest<WorkflowInput>>, res: Response) {
   try {
     const { input } = req.body || {};
     // Input pode ser undefined se o body estiver mal formado, mas assumindo middleware json
@@ -14,7 +11,7 @@ export async function workflowGenerateTool(
       return res.status(400).json({
         tool: "workflow-generate",
         status: "error",
-        message: "Missing input object"
+        message: "Missing input object",
       });
     }
 

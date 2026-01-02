@@ -2,15 +2,15 @@ import express, { Express, Request, Response } from "express";
 import { authMiddleware } from "./middlewares/auth.js";
 import { rateLimitMiddleware } from "./middlewares/rateLimit.js";
 
-import { pingTool } from "./tools/ping.js";
-import { callN8nWebhook } from "./tools/callN8nWebhook.js";
-import { aiTool } from "./tools/ai.js";
-import { aiInfoTool } from "./tools/aiInfo.js";
-import { evolutionWebhookTool } from "./tools/evolutionWebhook.js";
-import { workflowRunN8nTool } from "./tools/workflowRunN8n.js";
-import { workflowGenerateTool } from "./tools/workflowGenerate.js";
-import { agentWorkflowFromText } from "./tools/agentWorkflowFromText.js";
-
+import { pingTool } from "./tools/system/ping.js";
+import { callN8nWebhook } from "./tools/n8n/callN8nWebhook.js";
+import { aiTool } from "./tools/ai/ai.js";
+import { aiInfoTool } from "./tools/ai/aiInfo.js";
+import { evolutionWebhookTool } from "./tools/evolution/evolutionWebhook.js";
+import { workflowRunN8nTool } from "./tools/n8n/workflowRunN8n.js";
+import { workflowGenerateTool } from "./tools/n8n/workflowGenerate.js";
+import { agentWorkflowFromText } from "./tools/n8n/agentWorkflowFromText.js";
+import { createGitHubIssueTool } from "./tools/github/createIssue.js";
 export function createMcpServer(): Express {
   const app = express();
   app.set("trust proxy", 1);
@@ -52,6 +52,16 @@ export function createMcpServer(): Express {
   app.post("/tools/n8n", authMiddleware("workflow:run"), callN8nWebhook);
 
   app.post("/agent/workflow/from-text", authMiddleware("workflow:generate"), agentWorkflowFromText);
+
+  app.post(
+    "/tools/github/issue/create",
+    authMiddleware("github:issue:create"),
+    rateLimitMiddleware,
+    async (req, res) => {
+      const result = await createGitHubIssueTool(req.body)
+      res.json(result)
+    }
+  )
 
   return app;
 }

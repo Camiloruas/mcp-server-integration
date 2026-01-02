@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { workflowGenerateTool } from "./workflowGenerate.js";
-import { callOpenAI } from "../services/openai.js";
-import { McpToolRequest } from "../types/mcp.js";
+import { callOpenAI } from "../../services/openai.js";
+import { McpToolRequest } from "../../types/mcp.js";
 
 interface AgentInput {
   text: string;
@@ -14,7 +14,7 @@ export async function agentWorkflowFromText(req: Request<{}, {}, McpToolRequest<
 
     if (!text) {
       return res.status(400).json({
-        error: "text is required"
+        error: "text is required",
       });
     }
 
@@ -34,7 +34,7 @@ Formato:
     // 2️⃣ Chamada ao GPT
     const aiResponse = await callOpenAI({
       system: systemPrompt,
-      user: text
+      user: text,
     });
 
     if (!aiResponse) {
@@ -60,7 +60,7 @@ Formato:
     console.error("agentWorkflowFromText error:", err);
 
     return res.status(500).json({
-      error: (err as Error).message
+      error: (err as Error).message,
     });
   }
 }

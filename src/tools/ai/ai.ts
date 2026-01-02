@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import OpenAI from "openai";
-import { McpToolRequest } from "../types/mcp.js";
+import { McpToolRequest } from "../../types/mcp.js";
 
 interface AiInput {
   prompt: string;
