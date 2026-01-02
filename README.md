@@ -1,6 +1,6 @@
 # MCP Server Integration
 
-Este repositório apresenta a implementação de um **MCP Server (Model Context Protocol)** em Node.js, projetado para atuar como uma **camada central de orquestração, governança e segurança** entre agentes de IA, ferramentas internas, automações e serviços externos.
+Este repositório apresenta a implementação de um **MCP Server (Model Context Protocol)** em Node.js com TypeScript, projetado para atuar como uma **camada central de orquestração, governança e segurança** entre agentes de IA, ferramentas internas, automações e serviços externos.
 
 O projeto não é limitado a uma única plataforma. O n8n é utilizado como **uma das ferramentas integradas**, servindo como prova prática de criação e execução de automações, mas a arquitetura foi pensada para suportar **múltiplas tools**, agentes e integrações ao longo do tempo.
 
@@ -52,32 +52,52 @@ A IA não acessa ferramentas externas diretamente. Toda interação passa pelo M
 
 ## Estrutura do Projeto
 
+O projeto foi migrado para TypeScript para maior segurança e escalabilidade.
+
 ```
 src/
-├── middlewares/
-│   ├── auth.js
-│   └── rateLimit.js
-├── tools/
-│   ├── ai.js
-│   ├── aiInfo.js
-│   ├── workflowRunN8n.js
-│   ├── workflowGenerate.js
-│   ├── agentWorkflowFromText.js
-│   └── outras tools futuras
-├── mcpServer.js
-└── index.js
+├── middlewares/       # Validadores e segurança (Auth, Rate Limit)
+├── services/          # Serviços externos (OpenAI, etc)
+├── tools/             # Ferramentas expostas via MCP (n8n, AI, etc)
+├── types/             # Definições de tipos TypeScript (Contratos)
+├── index.ts           # Ponto de entrada
+└── mcpServer.ts       # Configuração do servidor Express
 ```
 
 A pasta `tools` é extensível e pode receber integrações com qualquer tipo de serviço ou automação.
 
 ---
 
-## Execução com Docker
+## Execução
 
-Pré-requisitos:
+### Pré-requisitos
 
-- Docker
-- Docker Compose
+- Node.js (v18+)
+- Docker (opcional)
+
+### Desenvolvimento Local
+
+1. Instalar dependências:
+   ```bash
+   npm install
+   ```
+2. Rodar em modo dev:
+   ```bash
+   npm run dev
+   ```
+
+### Produção
+
+1. Build do projeto:
+   ```bash
+   npm run build
+   ```
+2. Iniciar servidor:
+   ```bash
+   npm start
+   ```
+
+### Docker
 
 Subir o ambiente:
 
@@ -126,7 +146,7 @@ Exemplos de escopos:
 - workflow:run
 - workflow:generate
 - ai:use
-- admin:\*
+- admin:*
 
 ---
 
@@ -178,8 +198,8 @@ Nenhuma ferramenta externa é acessada diretamente pela IA.
 
 Camilo Ruas
 
-GitHub: https://github.com/Camiloruas  
-LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/  
+GitHub: https://github.com/Camiloruas
+LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/
 Portfólio: [camiloruas.dev](https://www.camiloruas.dev/)
 
 Este projeto está em evolução contínua e serve como base para estudos, automações e aplicações reais utilizando MCP, IA e integração de serviços.
