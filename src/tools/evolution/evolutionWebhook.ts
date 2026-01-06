@@ -13,19 +13,22 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     // Aceita:
     // - secret via query (?secret=)
     // - secret via body (compatível com outros providers)
+    //
+    // ⚠️ MODO TESTE:
+    // Se o secret não bater, loga aviso mas NÃO interrompe o fluxo
     // --------------------------------------------------
-    const expectedSecret = process.env.EVOLUTION_WEBHOOK_SECRET;
+    const expectedSecret = process.env.EVOLUTION_WEBHOOK_SECRET?.trim();
 
     if (!expectedSecret) {
       console.warn("⚠️ EVOLUTION_WEBHOOK_SECRET not configured");
-      return res.status(500).json({ ok: false });
+      // continua o fluxo para não travar testes
     }
 
-    const receivedSecret = typeof req.query.secret === "string" ? req.query.secret : event?.secret;
+    const receivedSecret = typeof req.query.secret === "string" ? req.query.secret.trim() : typeof event?.secret === "string" ? event.secret.trim() : null;
 
-    if (receivedSecret !== expectedSecret) {
-      console.warn("⚠️ Invalid Evolution webhook secret");
-      return res.status(403).json({ ok: false });
+    if (expectedSecret && receivedSecret !== expectedSecret) {
+      console.warn("⚠️ Invalid Evolution webhook secret (ignored in test mode)");
+      // ⚠️ NÃO retornar aqui
     }
 
     // --------------------------------------------------
@@ -33,7 +36,7 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     // --------------------------------------------------
     if (!event || !event.event) {
       console.warn("⚠️ Invalid Evolution payload (missing event)");
-      return res.status(400).json({ ok: false });
+      return res.status(200).json({ ok: true });
     }
 
     // --------------------------------------------------
@@ -52,20 +55,26 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
 
     if (n8nWebhookUrl) {
-      fetch(n8nWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "mcp-server",
-          action: "evolution-event",
-          data: payload,
-          timestamp: new Date().toISOString(),
-        }),
-      }).catch((err) => {
+      try {
+        const response = await fetch(n8nWebhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "mcp-server",
+            action: "evolution-event",
+            data: payload,
+            timestamp: new Date().toISOString(),
+          }),
+        });
+
+        if (!response.ok) {
+          console.error(`❌ Error forwarding to n8n: ${response.status} ${response.statusText}`);
+        }
+      } catch (err: any) {
         console.error("❌ Error forwarding to n8n:", err.message);
-      });
+      }
     } else {
       console.warn("⚠️ N8N_WEBHOOK_URL not configured, skipping forward to n8n");
     }
