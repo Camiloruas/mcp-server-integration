@@ -11,8 +11,10 @@ import { workflowRunN8nTool } from "./tools/n8n/workflowRunN8n.js";
 import { workflowGenerateTool } from "./tools/n8n/workflowGenerate.js";
 import { agentWorkflowFromText } from "./agents/agentWorkflowFromText.js";
 import { createGitHubIssueTool } from "./tools/github/createIssue.js";
+
 export function createMcpServer(): Express {
   const app = express();
+
   app.set("trust proxy", 1);
   app.use(express.json());
 
@@ -26,13 +28,24 @@ export function createMcpServer(): Express {
     });
   });
 
-  //  Rotas abertas
+  // ------------------------------------------------------------------
+  // ROTAS ABERTAS (seguras por design)
+  // ------------------------------------------------------------------
+
+  // Ping (health / debug)
   app.get("/tools/ping", pingTool);
 
-  //  Rate limit aplicado a TODAS as rotas protegidas
-  app.use(rateLimitMiddleware);
+  // Webhook da Evolution (provider externo)
+  // ❗ NÃO usa authMiddleware
+  // ✔ Protegido por rate limit + validação interna + secret
+  app.post("/webhook/evolution", rateLimitMiddleware, evolutionWebhookTool);
 
-  //  Rotas protegidas COM SCOPES
+  // ------------------------------------------------------------------
+  // A PARTIR DAQUI: ROTAS PROTEGIDAS
+  // ------------------------------------------------------------------
+
+  // Rate limit global para rotas protegidas
+  app.use(rateLimitMiddleware);
 
   // Executar workflow (n8n, admin)
   app.post("/tools/workflow/run", authMiddleware("workflow:run"), workflowRunN8nTool);
@@ -45,23 +58,17 @@ export function createMcpServer(): Express {
 
   app.get("/tools/ai/info", authMiddleware("ai:use"), aiInfoTool);
 
-  // Webhook sensível (somente admin)
-  app.post("/webhook/evolution", authMiddleware("admin:*"), evolutionWebhookTool);
-
-  // (opcional) endpoint genérico n8n
+  // Endpoint genérico n8n
   app.post("/tools/n8n", authMiddleware("workflow:run"), callN8nWebhook);
 
+  // Agente
   app.post("/agent/workflow/from-text", authMiddleware("workflow:generate"), agentWorkflowFromText);
 
-  app.post(
-    "/tools/github/issue/create",
-    authMiddleware("github:issue:create"),
-    rateLimitMiddleware,
-    async (req, res) => {
-      const result = await createGitHubIssueTool(req.body)
-      res.json(result)
-    }
-  )
+  // GitHub Issue
+  app.post("/tools/github/issue/create", authMiddleware("github:issue:create"), rateLimitMiddleware, async (req, res) => {
+    const result = await createGitHubIssueTool(req.body);
+    res.json(result);
+  });
 
   return app;
 }
