@@ -131,8 +131,8 @@ The architecture was designed to facilitate the addition of new tools, such as i
 
 Camilo Ruas
 
-GitHub: https://github.com/Camiloruas
-LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/
+GitHub: https://github.com/Camiloruas  
+LinkedIn: https://www.linkedin.com/in/camilo-ruas-3a2a6425/  
 Portfolio: https://www.camiloruas.dev/
 
 ---
