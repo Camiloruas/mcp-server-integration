@@ -6,7 +6,7 @@ export interface McpToolResponse {
     tool: string;
     status: "ok" | "error";
     message?: string;
-    [key: string]: any; // Permite campos extras como 'result', 'workflowId', etc.
+    [key: string]: any; // Allows extra fields like 'result', 'workflowId', etc.
 }
 
 export interface Node {

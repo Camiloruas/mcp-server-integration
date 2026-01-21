@@ -15,7 +15,7 @@ function getOpenAIClient(): OpenAI | null {
 
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-    timeout: 30000, //  30 segundos
+    timeout: 30000, // 30 seconds
   });
 }
 
@@ -27,7 +27,7 @@ function mockResponse(prompt: string, reason = "mock") {
     fallback: true,
     reason,
     prompt,
-    response: "IA mock funcionando",
+    response: "Mock AI functioning",
   };
 }
 
@@ -53,7 +53,7 @@ export async function aiTool(req: Request<{}, {}, McpToolRequest<AiInput>>, res:
     });
   }
 
-  /* MOCK FORÇADO */
+  /* FORCED MOCK */
   if (process.env.AI_MODE !== "openai") {
     return res.json({
       tool: "ai",
@@ -61,11 +61,11 @@ export async function aiTool(req: Request<{}, {}, McpToolRequest<AiInput>>, res:
       mode: "mock",
       fallback: false,
       prompt,
-      response: "IA mock funcionando",
+      response: "Mock AI functioning",
     });
   }
 
-  /* OPENAI COM TIMEOUT + RETRY + FALLBACK */
+  /* OPENAI WITH TIMEOUT + RETRY + FALLBACK */
   try {
     const client = getOpenAIClient();
     if (!client) throw new Error("Client initialization failed");
@@ -73,7 +73,7 @@ export async function aiTool(req: Request<{}, {}, McpToolRequest<AiInput>>, res:
     const payload = {
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Você é um assistente técnico e objetivo." },
+        { role: "system", content: "You are a technical and objective assistant." },
         { role: "user", content: prompt },
       ],
       temperature: 0.4,

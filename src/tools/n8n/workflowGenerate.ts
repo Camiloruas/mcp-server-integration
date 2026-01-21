@@ -5,7 +5,7 @@ import { McpToolRequest, WorkflowInput } from "../../types/mcp.js";
 export async function workflowGenerateTool(req: Request<{}, {}, McpToolRequest<WorkflowInput>>, res: Response) {
   try {
     const { input } = req.body || {};
-    // Input pode ser undefined se o body estiver mal formado, mas assumindo middleware json
+    // Input can be undefined if body is malformed, but assuming middleware json
 
     if (!input) {
       return res.status(400).json({
@@ -25,7 +25,7 @@ export async function workflowGenerateTool(req: Request<{}, {}, McpToolRequest<W
       });
     }
 
-    // ❌ NÃO pode enviar `active` aqui
+    // ❌ CANNOT send `active` here
     const workflow = {
       name: name || `workflow-generated-${Date.now()}`,
       nodes,
@@ -35,7 +35,7 @@ export async function workflowGenerateTool(req: Request<{}, {}, McpToolRequest<W
 
     console.log(`[workflowGenerate] Creating workflow: ${workflow.name}`);
 
-    // 1️⃣ Cria o workflow
+    // 1️⃣ Creates the workflow
     const response = await fetch(`${process.env.N8N_BASE_URL}/api/v1/workflows`, {
       method: "POST",
       headers: {
@@ -52,7 +52,7 @@ export async function workflowGenerateTool(req: Request<{}, {}, McpToolRequest<W
 
     const data: any = await response.json();
 
-    // 2️⃣ ATIVA o workflow (chamada separada — isso é permitido)
+    // 2️⃣ ACTIVATES the workflow (separate call — this is allowed)
     try {
       await fetch(`${process.env.N8N_BASE_URL}/api/v1/workflows/${data.id}/activate`, {
         method: "POST",
@@ -64,7 +64,7 @@ export async function workflowGenerateTool(req: Request<{}, {}, McpToolRequest<W
       console.warn(`[workflowGenerate] Workflow created but not activated: ${(activateErr as Error).message}`);
     }
 
-    // 3️⃣ Monta webhook URL (sua lógica preservada)
+    // 3️⃣ Assembles webhook URL (your logic preserved)
     let webhookUrl = null;
     const webhookNode = nodes.find((n: any) => n.type?.includes("webhook"));
 

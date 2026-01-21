@@ -9,30 +9,30 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     const event = req.body;
 
     // --------------------------------------------------
-    // Validação do secret do webhook (CAMADA DE SEGURANÇA)
-    // Aceita:
+    // Webhook secret validation (SECURITY LAYER)
+    // Accepts:
     // - secret via query (?secret=)
-    // - secret via body (compatível com outros providers)
+    // - secret via body (compatible with other providers)
     //
-    // ⚠️ MODO TESTE:
-    // Se o secret não bater, loga aviso mas NÃO interrompe o fluxo
+    // ⚠️ TEST MODE:
+    // If the secret doesn't match, logs warning but DOES NOT interrupt the flow
     // --------------------------------------------------
     const expectedSecret = process.env.EVOLUTION_WEBHOOK_SECRET?.trim();
 
     if (!expectedSecret) {
       console.warn("⚠️ EVOLUTION_WEBHOOK_SECRET not configured");
-      // continua o fluxo para não travar testes
+      // continues the flow to not block tests
     }
 
     const receivedSecret = typeof req.query.secret === "string" ? req.query.secret.trim() : typeof event?.secret === "string" ? event.secret.trim() : null;
 
     if (expectedSecret && receivedSecret !== expectedSecret) {
       console.warn("⚠️ Invalid Evolution webhook secret (ignored in test mode)");
-      // ⚠️ NÃO retornar aqui
+      // ⚠️ DO NOT return here
     }
 
     // --------------------------------------------------
-    // Validação mínima do payload
+    // Minimal payload validation
     // --------------------------------------------------
     if (!event || !event.event) {
       console.warn("⚠️ Invalid Evolution payload (missing event)");
@@ -40,7 +40,7 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     }
 
     // --------------------------------------------------
-    // Normalização do payload
+    // Payload normalization
     // --------------------------------------------------
     const payload = {
       source: "evolution",
@@ -50,7 +50,7 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     };
 
     // --------------------------------------------------
-    // Forward para o n8n
+    // Forward to n8n
     // --------------------------------------------------
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
 
@@ -80,7 +80,7 @@ export async function evolutionWebhookTool(req: Request, res: Response) {
     }
 
     // --------------------------------------------------
-    // Sempre responder 200 para a Evolution
+    // Always return 200 for Evolution
     // --------------------------------------------------
     return res.status(200).json({ ok: true });
   } catch (err) {

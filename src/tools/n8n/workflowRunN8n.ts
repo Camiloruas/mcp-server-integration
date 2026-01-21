@@ -14,7 +14,7 @@ export async function workflowRunN8nTool(req: Request, res: Response) {
       });
     }
 
-    // Executa via Webhook conforme decisão arquitetural
+    // Executes via Webhook according to architectural decision
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {

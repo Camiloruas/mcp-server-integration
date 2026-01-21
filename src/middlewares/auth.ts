@@ -59,7 +59,7 @@ export function authMiddleware(requiredScope: string | null = null) {
       });
     }
 
-    // Anexa info da key à request (útil para logs)
+    // Attaches key info to request (useful for logs)
     (req as AuthenticatedRequest).apiKey = {
       name: matchedKey.name,
       scopes: matchedKey.scopes || [],

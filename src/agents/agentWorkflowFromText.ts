@@ -5,9 +5,9 @@ import { callOpenAI } from "../services/openai.js";
 import { McpToolRequest } from "../types/mcp.js";
 
 /**
- * O agent agora aceita dois tipos de input:
- * - Texto livre (para decisão e geração)
- * - Payload estruturado (quando ele reencaminha para uma tool)
+ * The agent now accepts two types of input:
+ * - Free text (for decision and generation)
+ * - Structured payload (when forwarding to a tool)
  */
 type AgentInput =
   | { text: string }
@@ -26,7 +26,7 @@ export async function agentWorkflowFromText(
   try {
     const { input } = req.body || {};
 
-    // 🔐 Type guard correto para acessar `text`
+    // 🔐 Correct type guard to access `text`
     const text =
       input && typeof input === "object" && "text" in input
         ? input.text
@@ -38,7 +38,7 @@ export async function agentWorkflowFromText(
       });
     }
 
-    // 🔎 0️⃣ Detecta intenção GitHub Issue
+    // 🔎 0️⃣ Detects GitHub Issue intent
     const isGithubIssueIntent =
       /criar issue|crie uma issue|abrir issue|issue no github/i.test(text);
 
@@ -54,11 +54,11 @@ export async function agentWorkflowFromText(
         labels: ["mcp"],
       };
 
-      // Reaproveita o padrão do MCP: adapta o body para a tool
+      // Reuses MCP pattern: adapts body for the tool
       req.body.input = payload;
 
-      // A tool assume o contrato dela a partir daqui
-      // @ts-ignore – runtime é válido (Express)
+      // The tool assumes its contract from here
+      // @ts-ignore – runtime is valid (Express)
       return createGitHubIssueTool(req, res);
     }
 
@@ -67,10 +67,10 @@ export async function agentWorkflowFromText(
     // ============================
 
     const systemPrompt = `
-Você é um arquiteto de workflows do n8n.
-Gere APENAS JSON válido.
-Nunca explique nada.
-Formato:
+You are an n8n workflow architect.
+Generate ONLY valid JSON.
+Never explain anything.
+Format:
 {
   "name": "...",
   "nodes": [...],
@@ -96,7 +96,7 @@ Formato:
 
     req.body.input = workflowJson;
 
-    // @ts-ignore – delegação direta para a tool
+    // @ts-ignore – direct delegation to the tool
     return workflowGenerateTool(req, res);
   } catch (err) {
     console.error("agentWorkflowFromText error:", err);
